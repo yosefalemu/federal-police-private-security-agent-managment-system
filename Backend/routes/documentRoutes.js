@@ -11,8 +11,14 @@ const {
   acceptDocument,
   rejectDocument,
   uploadFile,
+  checkDocument,
+  findUncheckedDocuments,
+  findcheckedDocuments,
 } = require("../controllers/documentController");
 
+router
+  .route("/checkdocument/:id")
+  .patch(authenticateUser, authorizePermissions("screener"), checkDocument);
 router
   .route("/")
   .get(
@@ -22,6 +28,16 @@ router
   );
 router.route("/uploadFile").post(uploadFile);
 router.route("/apply").post(createDocument);
+router
+  .route("/getunchecked")
+  .get(
+    authenticateUser,
+    authorizePermissions("screener"),
+    findUncheckedDocuments
+  );
+router
+  .route("/getchecked")
+  .get(authenticateUser, authorizePermissions("admin"), findcheckedDocuments);
 router
   .route("/acceptDocument/:id")
   .patch(

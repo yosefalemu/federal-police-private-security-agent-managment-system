@@ -47,13 +47,15 @@ const LogInPage = () => {
   const handleLogin = () => {
     dispatch(loginUserStart());
     axios
-      .post("http://localhost:5000/api/v1/auth/login", user)
+      .post("http://localhost:5000/api/v1/auth/login", user, {
+        withCredentials: true,
+      })
       .then((response) => {
         console.log(response);
         dispatch(loginUserSuccess(response.data));
         toast.success("Logged in");
         setTimeout(() => {
-          navigate("/home");
+          navigate("/profile");
         }, 4000);
       })
       .catch((error) => {
@@ -81,7 +83,7 @@ const LogInPage = () => {
             component="h1"
             variant="h4"
             textAlign={"center"}
-            color={"#EDC154"}
+            color={"#112846"}
             fontWeight={700}
             sx={{ marginBottom: "30px" }}
           >

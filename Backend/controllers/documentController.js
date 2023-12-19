@@ -15,8 +15,6 @@ const createDocument = async (req, res) => {
   if (documentExists) {
     if (documentExists.email === email) {
       throw new BadRequestError("the email is already exist in the doucments");
-    } else {
-      throw new BadRequestError("The Document already exist in the system");
     }
   }
   const document = await DocumentSchema.create(req.body);
@@ -35,7 +33,9 @@ const getAllDocuments = async (req, res) => {
   if (documents) {
     res.status(201).json(documents);
   } else {
-    res.status(200).json({msg:"Something went wrong it is not fetching the datas"})
+    res
+      .status(200)
+      .json({ msg: "Something went wrong it is not fetching the datas" });
   }
 };
 
@@ -163,6 +163,31 @@ const uploadFile = async (req, res) => {
   await uploadFile.mv(filePath);
   res.status(StatusCodes.OK).json({ image: `${prefixedFileName}` });
 };
+const checkDocument = async (req, res) => {
+  const id = req.params.id;
+  const updatedDocument = await DocumentSchema.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!updatedDocument) {
+    throw new BadRequestError(`No document with id ${id} to be updated`);
+  }
+  res.status(StatusCodes.OK).json({ updatedDocument });
+};
+const findUncheckedDocuments = async (req, res) => {
+  const documents = await DocumentSchema.find({ checked: false });
+  if (!documents) {
+    throw new BadRequestError("No new request");
+  }
+  res.status(StatusCodes.OK).json({ documents: documents });
+};
+const findcheckedDocuments = async (req, res) => {
+  const documents = await DocumentSchema.find({ checked: true });
+  if (!documents) {
+    throw new BadRequestError("No new request");
+  }
+  res.status(StatusCodes.OK).json({ documents: documents });
+};
 
 module.exports = {
   createDocument,
@@ -171,4 +196,7 @@ module.exports = {
   acceptDocument,
   rejectDocument,
   uploadFile,
+  checkDocument,
+  findUncheckedDocuments,
+  findcheckedDocuments,
 };

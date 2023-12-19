@@ -43,7 +43,7 @@ export default function LoginHeader() {
           >
             <Avatar
               alt="FederalPolice"
-              src="public/images/federal.jpg"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Federal_Police_Commission_of_Ethiopia_Coat_of_Arms_and_Logo.jpg/220px-Federal_Police_Commission_of_Ethiopia_Coat_of_Arms_and_Logo.jpg"
               sx={{ width: 65, height: 65 }}
             />
           </IconButton>

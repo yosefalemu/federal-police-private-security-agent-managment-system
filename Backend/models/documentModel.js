@@ -8,29 +8,6 @@ const DocumentSchema = new mongoose.Schema(
       minlength: [3, "name must be minimum length of 3"],
       maxlength: [50, "name must be maximum length of 50"],
     },
-
-    agentLogo: {
-      type: String,
-      required: [true, "please provide the agent logo"],
-    },
-    agentFile: {
-      type: String,
-      required: [true, "upload all files scanned and merged"],
-    },
-    address: {
-      city: {
-        type: String,
-        required: [true, "please provide city name"],
-      },
-      woreda: {
-        type: String,
-        required: [true, "please provide woreda"],
-      },
-      kebele: {
-        type: String,
-        required: [true, "please provide kebele"],
-      },
-    },
     firstName: {
       type: String,
       required: [true, "please provide the first name"],
@@ -49,11 +26,6 @@ const DocumentSchema = new mongoose.Schema(
       minlength: [3, "name must be minimum length of 3"],
       maxlength: [50, "name must be maximum length of 50"],
     },
-
-    ownerFile: {
-      type: String,
-      required: [true, "please provide all the scanned and merged files"],
-    },
     email: {
       type: String,
       match: [
@@ -62,11 +34,38 @@ const DocumentSchema = new mongoose.Schema(
       ],
       unique: true,
     },
-   
     phoneNumber: {
       type: String,
       required: [true, "please provide the phone number"],
     },
+    address: {
+      city: {
+        type: String,
+        required: [true, "please provide city name"],
+      },
+      woreda: {
+        type: String,
+        required: [true, "please provide woreda"],
+      },
+      kebele: {
+        type: String,
+        required: [true, "please provide kebele"],
+      },
+    },
+    agentLogo: {
+      type: String,
+      required: [true, "please provide the agent logo"],
+    },
+    agentFile: {
+      type: String,
+      required: [true, "upload all files scanned and merged"],
+    },
+
+    ownerFile: {
+      type: String,
+      required: [true, "please provide all the scanned and merged files"],
+    },
+
     profilePicture: {
       type: String,
       required: [true, "please provide the profile picture"],
@@ -83,7 +82,5 @@ const DocumentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-
 
 module.exports = mongoose.model("DocumentSchema", DocumentSchema);

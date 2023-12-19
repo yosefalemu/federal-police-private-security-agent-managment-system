@@ -12,6 +12,9 @@ import {
   InputLabel,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import toast from "react-hot-toast";
+import axios from "axios";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const FileContainer = styled(Box)({
   display: "flex",
@@ -62,25 +65,172 @@ const ApplyButton = styled(Button)({
 });
 
 const ApplyPage = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
   const [profilePicture, setProfilePicture] = useState("");
   const [agentLogo, setAgentLogo] = useState("");
   const [agentFile, setAgentFile] = useState("");
   const [ownerFile, setOwnerFile] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
+  const [apply, setApply] = useState({
+    agentName: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    city: "",
+    woreda: "",
+    kebele: "",
+  });
+
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setApply({
+      ...apply,
+      [name]: value,
+    });
   };
 
-  const handleUpload = () => {
-    // Add logic to handle file upload
-    if (selectedFile) {
-      // Perform file upload logic here
-      console.log("File uploaded:", selectedFile);
-    } else {
-      console.log("No file selected");
+  const uploadAgentsLogo = async (e) => {
+    e.preventDefault();
+    console.log("first");
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/users/uploadImage", formData)
+      .then((response) => {
+        console.log(response);
+        setAgentLogo(response.data.image);
+        toast.success("Agent's Logo uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+  const uploadAgentsFile = async (e) => {
+    e.preventDefault();
+    console.log("tested");
+
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/documents/uploadFile", formData)
+      .then((response) => {
+        console.log(response);
+        setAgentFile(response.data.image);
+        toast.success("Agent file upload successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+
+  const uploadOwnerFile = async (e) => {
+    e.preventDefault();
+    console.log("third");
+
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/documents/uploadFile", formData)
+      .then((response) => {
+        console.log(response);
+        setOwnerFile(response.data.image);
+        toast.success("Owner file upload successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+
+  const uploadAgentsAdminProfilePicture = async (e) => {
+    e.preventDefault();
+    console.log("first");
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/users/uploadImage", formData)
+      .then((response) => {
+        console.log(response);
+        setProfilePicture(response.data.image);
+        toast.success("Agent's Admin profile picture uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+  const createDocument = () => {
+    const address = {
+      city: apply.city,
+      kebele: apply.kebele,
+      woreda: apply.woreda,
+    };
+    console.log("agentLogo", agentLogo);
+    console.log("agentFile", agentFile);
+    console.log("ownerFile", ownerFile);
+    console.log("profile picture", profilePicture);
+    if (!agentLogo || !agentFile || !ownerFile || !profilePicture) {
+      toast.error("Please upload all required files");
+      return;
     }
+
+    const documentData = {
+      agentName: apply.agentName,
+      firstName: apply.firstName,
+      middleName: apply.middleName,
+      lastName: apply.lastName,
+      email: apply.email,
+      phoneNumber: apply.phoneNumber,
+      address: address,
+      agentLogo: agentLogo,
+      agentFile: agentFile,
+      ownerFile: ownerFile,
+      profilePicture: profilePicture,
+    };
+    console.log(documentData);
+
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/documents/apply", documentData)
+      .then((response) => {
+        console.log(response);
+        // setProfilePicture(response.data.image);
+        toast.success("Document send wait response on your email");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
   };
 
   return (
@@ -99,7 +249,7 @@ const ApplyPage = () => {
           fontSize={42}
           marginBottom={2}
           fontWeight={700}
-          color={"#EDC154"}
+          color={"#112846"}
         >
           Apply Here to be Certified
         </Typography>
@@ -115,11 +265,22 @@ const ApplyPage = () => {
             variant="h5"
             gutterBottom
             fontWeight={"600"}
-            color={"#EDC154"}
+            color={"#112846"}
           >
             Fill all the required informations
           </Typography>
           <WholeInputContainer>
+            {loading && (
+              <Box textAlign={"center"}>
+                <ClipLoader
+                  color={"#36d7b7"}
+                  loading={loading}
+                  size={50}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              </Box>
+            )}
             <TextField
               id="agentName"
               label="Agent Name"
@@ -129,6 +290,7 @@ const ApplyPage = () => {
               margin="normal"
               required
               fullWidth
+              onChange={handleFormChange}
             />
             <TextField
               id="firstName"
@@ -139,6 +301,7 @@ const ApplyPage = () => {
               margin="normal"
               required
               fullWidth
+              onChange={handleFormChange}
             />
             <TextField
               id="middleName"
@@ -149,6 +312,7 @@ const ApplyPage = () => {
               margin="normal"
               required
               fullWidth
+              onChange={handleFormChange}
             />
             <TextField
               id="lastName"
@@ -159,6 +323,7 @@ const ApplyPage = () => {
               margin="normal"
               required
               fullWidth
+              onChange={handleFormChange}
             />
             <TextField
               id="email"
@@ -169,6 +334,7 @@ const ApplyPage = () => {
               margin="normal"
               required
               fullWidth
+              onChange={handleFormChange}
             />
             <TextField
               id="phoneNumber"
@@ -179,78 +345,96 @@ const ApplyPage = () => {
               margin="normal"
               required
               fullWidth
+              onChange={handleFormChange}
+            />
+            <TextField
+              id="city"
+              label="City"
+              name="city"
+              autoFocus
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              onChange={handleFormChange}
+            />
+            <TextField
+              id="woreda"
+              label="Woreda"
+              name="woreda"
+              autoFocus
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              onChange={handleFormChange}
+            />
+            <TextField
+              id="kebele"
+              label="Kebele"
+              name="kebele"
+              autoFocus
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              onChange={handleFormChange}
             />
 
             <FileContainer>
               <InputContainer>
-                <Typography color={"#EDC154"}>
-                  Upload Your Profile Picture
-                </Typography>
-                <InputLabelContainer htmlFor="fileInput">
+                <Typography color={"#112846"}>Upload Agent Logo</Typography>
+                <InputLabelContainer htmlFor="agentLogoInput">
                   <UploadFileIcon style={{ marginRight: "5px" }} />
                   <Input
                     type="file"
-                    id="fileInput"
+                    id="agentLogoInput"
+                    onChange={uploadAgentsLogo}
                     style={{ display: "none" }}
                   />
                 </InputLabelContainer>
               </InputContainer>
               <InputContainer>
-                <Typography color={"#EDC154"}>
-                  Upload your nigd fikad
-                </Typography>
-                <InputLabelContainer htmlFor="fileInput">
+                <Typography color={"#112846"}>Upload Agent's File</Typography>
+                <InputLabelContainer htmlFor="AgentsFileInput">
                   <UploadFileIcon style={{ marginRight: "5px" }} />
                   <Input
                     type="file"
-                    id="fileInput"
-                    fullWidth
+                    id="AgentsFileInput"
+                    onChange={uploadAgentsFile}
                     style={{ display: "none" }}
                   />
                 </InputLabelContainer>
               </InputContainer>
               <InputContainer>
-                <Typography color={"#EDC154"}>
-                  Upload your nigd fikad
-                </Typography>
-                <InputLabelContainer htmlFor="fileInput">
+                <Typography color={"#112846"}>Upload Owner's File</Typography>
+                <InputLabelContainer htmlFor="AgentsOwnerInput">
                   <UploadFileIcon style={{ marginRight: "5px" }} />
                   <Input
                     type="file"
-                    id="fileInput"
+                    id="AgentsOwnerInput"
+                    onChange={uploadOwnerFile}
                     style={{ display: "none" }}
                   />
                 </InputLabelContainer>
               </InputContainer>
               <InputContainer>
-                <Typography color={"#EDC154"}>
-                  Upload your nigd fikad
+                <Typography color={"#112846"}>
+                  Upload Profile Picture
                 </Typography>
-                <InputLabelContainer htmlFor="fileInput">
+                <InputLabelContainer htmlFor="AgentsAdminProfilePicture">
                   <UploadFileIcon style={{ marginRight: "5px" }} />
                   <Input
                     type="file"
-                    id="fileInput"
-                    style={{ display: "none" }}
-                  />
-                </InputLabelContainer>
-              </InputContainer>
-              <InputContainer>
-                <Typography color={"#EDC154"}>
-                  Upload your nigd fikad
-                </Typography>
-                <InputLabelContainer htmlFor="fileInput">
-                  <UploadFileIcon style={{ marginRight: "5px" }} />
-                  <Input
-                    type="file"
-                    id="fileInput"
+                    id="AgentsAdminProfilePicture"
+                    onChange={uploadAgentsAdminProfilePicture}
                     style={{ display: "none" }}
                   />
                 </InputLabelContainer>
               </InputContainer>
             </FileContainer>
           </WholeInputContainer>
-          <ApplyButton>Submit Application</ApplyButton>
+          <ApplyButton onClick={createDocument}>Submit Application</ApplyButton>
         </Paper>
       </Box>
     </Container>

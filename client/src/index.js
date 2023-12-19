@@ -4,6 +4,7 @@ import App from "./App.js";
 import { Toaster } from "react-hot-toast";
 import store from "./redux-toolkit/store.js";
 import { Provider } from "react-redux";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <>

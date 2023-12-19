@@ -78,7 +78,8 @@ const ProfilePage = () => {
     axios
       .patch(
         `http://localhost:5000/api/v1/users/updateProfile/${_id}`,
-        profileInfo
+        profileInfo,
+        { withCredentials: true }
       )
       .then((response) => {
         setUser(response.data.user);

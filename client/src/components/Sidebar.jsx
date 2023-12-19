@@ -21,13 +21,14 @@ import SecurityIcon from "@mui/icons-material/Security";
 import GroupsIcon from "@mui/icons-material/Groups";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../appStore";
 
-const drawerWidth = "230px";
+const drawerWidth = "180px";
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -92,7 +93,6 @@ export default function Sidebar() {
   const open = useAppStore((state) => state.dopen);
   const location = useLocation();
   const { role } = useSelector((state) => state.user.user);
-  console.log(role);
 
   const isActive = (route) => location.pathname === `/${route}`;
 
@@ -115,46 +115,6 @@ export default function Sidebar() {
           </IconButton>
         </DrawerHeader>
         <List sx={{ height: "100%", position: "relative", padding: "2" }}>
-          {role === "admin" && (
-            <ListItem
-              disablePadding
-              sx={{
-                display: "block",
-                padding: { md: "0px 5px 0px 0px" },
-                color: "black",
-                background: isActive("home") ? "lightgray" : "transparent",
-              }}
-              component={Link}
-              to="/home"
-            >
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  <HomeIcon sx={{ color: "white", fontSize: "28px" }} />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Requests"
-                  sx={{
-                    opacity: open ? 1 : 0,
-                    display: { xs: "none", md: "block" },
-                    color: "white",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          )}
-
           <ListItem
             disablePadding
             sx={{
@@ -169,14 +129,14 @@ export default function Sidebar() {
             <ListItemButton
               sx={{
                 minHeight: 48,
-                justifyContent: open ? "initial" : "center",
+                justifyContent: open ? "initial" : "left",
                 px: 2.5,
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : "auto",
+                  mr: open ? 2 : "auto",
                   justifyContent: "center",
                 }}
               >
@@ -216,7 +176,7 @@ export default function Sidebar() {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: open ? 2 : "auto",
                     justifyContent: "center",
                   }}
                 >
@@ -233,19 +193,17 @@ export default function Sidebar() {
               </ListItemButton>
             </ListItem>
           )}
-          {/* {role === "admin" && (
+          {role === "admin" && (
             <ListItem
               disablePadding
               sx={{
                 display: "block",
                 padding: { md: "0px 5px 0px 0px" },
                 color: "black",
-                background: isActive("allemployee")
-                  ? "lightgray"
-                  : "transparent",
+                background: isActive("home") ? "lightgray" : "transparent",
               }}
               component={Link}
-              to="/allemployee"
+              to="/adminRequest"
             >
               <ListItemButton
                 sx={{
@@ -257,14 +215,16 @@ export default function Sidebar() {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: open ? 2 : "auto",
                     justifyContent: "center",
                   }}
                 >
-                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <FormatListNumberedIcon
+                    sx={{ color: "white", fontSize: "28px" }}
+                  />
                 </ListItemIcon>
                 <ListItemText
-                  primary="All Employees"
+                  primary="Requests"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
@@ -273,21 +233,20 @@ export default function Sidebar() {
                 />
               </ListItemButton>
             </ListItem>
-          )} */}
-
-          {/* {(role === "admin" || "manager" || "agent") && (
+          )}
+          {role === "screener" && (
             <ListItem
               disablePadding
               sx={{
                 display: "block",
                 padding: { md: "0px 5px 0px 0px" },
                 color: "black",
-                background: isActive("agentemployee")
+                background: isActive("screenerrequest")
                   ? "lightgray"
                   : "transparent",
               }}
               component={Link}
-              to="/agentemployee"
+              to="/screenerrequest"
             >
               <ListItemButton
                 sx={{
@@ -299,14 +258,16 @@ export default function Sidebar() {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: open ? 2 : "auto",
                     justifyContent: "center",
                   }}
                 >
-                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <FormatListNumberedIcon
+                    sx={{ color: "white", fontSize: "28px" }}
+                  />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Employees"
+                  primary="Requests"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
@@ -315,7 +276,7 @@ export default function Sidebar() {
                 />
               </ListItemButton>
             </ListItem>
-          )} */}
+          )}
 
           {role === "agent" && (
             <ListItem
@@ -341,14 +302,58 @@ export default function Sidebar() {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: open ? 2 : "auto",
                     justifyContent: "center",
                   }}
                 >
-                  <GroupAddIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <PersonAddAlt1Icon
+                    sx={{ color: "white", fontSize: "28px" }}
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary="Add Employee"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "white",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+
+          {role === "agent" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("allemployee")
+                  ? "lightgray"
+                  : "transparent",
+              }}
+              component={Link}
+              to="/allemployee"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Employees"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
@@ -375,7 +380,7 @@ export default function Sidebar() {
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : "auto",
+                  mr: open ? 2 : "auto",
                   justifyContent: "center",
                 }}
               >
