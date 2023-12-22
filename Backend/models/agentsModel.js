@@ -63,16 +63,20 @@ const AgentSchema = new mongoose.Schema(
       type: String,
       required: [true, "please provide the profile picture"],
     },
+    agentUniform: {
+      type: String,
+      required: [true, "please provide the agent agentUniform"],
+    },
     documentId: {
       type: mongoose.Types.ObjectId,
       ref: "DocumentSchema",
-      required:true,
+      required: true,
     },
-    userId:{
-      type:mongoose.Types.ObjectId,
-      ref:"UserSchema",
-      required:true,
-    }
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserSchema",
+      required: true,
+    },
   },
   { timestamps: true }
 );

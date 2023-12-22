@@ -70,6 +70,10 @@ const DocumentSchema = new mongoose.Schema(
       type: String,
       required: [true, "please provide the profile picture"],
     },
+    agentUniform: {
+      type: String,
+      required: [true, "please provide the agent uniform"],
+    },
     status: {
       type: String,
       enum: ["accepted", "rejected", "pending"],

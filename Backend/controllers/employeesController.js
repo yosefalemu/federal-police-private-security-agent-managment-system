@@ -1,22 +1,18 @@
 const UserSchema = require("../models/usersModel");
-const EmployeeSchema = require("../models/employeesModel")
+const EmployeeSchema = require("../models/employeesModel");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const {checkPermissions} = require("../utils")
+const { checkPermissions } = require("../utils");
 
 const createEmployee = async (req, res) => {
-  req.body.userId = req.user.userId;
-  const { email, firstName, middleName, lastName } = req.body;
+  // req.body.userId = req.user.userId;
+  const { email } = req.body;
   const employeeExists = await EmployeeSchema.findOne({
-    $or: [{ email }, { firstName, middleName, lastName }],
+    email: email,
   });
   if (employeeExists) {
-    if (employeeExists.email === email) {
-      throw new BadRequestError("email taken");
-    } else {
-      throw new BadRequestError("The employee already exist in the system");
-    }
+    throw new BadRequestError("email taken");
   }
   const employee = await EmployeeSchema.create(req.body);
 
@@ -32,8 +28,9 @@ const createEmployee = async (req, res) => {
 const getAllEmployees = async (req, res) => {
   const employees = await EmployeeSchema.find({});
   if (employees) {
-    res.status(201).json(employees);
+    res.status(201).json({ employees });
   } else {
+    throw new BadRequestError("No employee yet");
   }
 };
 
@@ -44,27 +41,41 @@ const getSingleEmployee = async (req, res) => {
     if (!employee) {
       throw new BadRequestError(`there is no Employee with id ${id}`);
     }
-    checkPermissions(req.user, employee.userId);
+    // checkPermissions(req.user, employee.userId);
     res.status(201).json(employee);
   } catch (error) {
     console.log(error);
   }
 };
 
-
 const updateEmployee = async (req, res) => {
- const { id: employeeId } = req.params;
+  const { id: employeeId } = req.params;
 
- const employee = await EmployeeSchema.findOneAndUpdate({ _id: employeeId }, req.body, {
-   new: true,
-   runValidators: true,
- });
+  const employee = await EmployeeSchema.findOneAndUpdate(
+    { _id: employeeId },
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
- if (!employee) {
-   throw new CustomError.NotFoundError(`No employee with id : ${employeeId}`);
- }
+  if (!employee) {
+    throw new CustomError.NotFoundError(`No employee with id : ${employeeId}`);
+  }
 
- res.status(StatusCodes.OK).json({ employee });
+  res.status(StatusCodes.OK).json({ employee });
+};
+
+const getAgentEmployee = async (req, res) => {
+  const agentId = req.params.agentId;
+  const employee = await EmployeeSchema.find({
+    agentId: agentId,
+  });
+  if (!employee) {
+    throw BadRequestError(`No Employee with agentId ${agentId}`);
+  }
+  res.status(StatusCodes.OK).json({ employee });
 };
 
 module.exports = {
@@ -72,4 +83,5 @@ module.exports = {
   getAllEmployees,
   getSingleEmployee,
   updateEmployee,
+  getAgentEmployee,
 };

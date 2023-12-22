@@ -19,7 +19,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SecurityIcon from "@mui/icons-material/Security";
 import GroupsIcon from "@mui/icons-material/Groups";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 
@@ -200,7 +199,9 @@ export default function Sidebar() {
                 display: "block",
                 padding: { md: "0px 5px 0px 0px" },
                 color: "black",
-                background: isActive("home") ? "lightgray" : "transparent",
+                background: isActive("adminRequest")
+                  ? "lightgray"
+                  : "transparent",
               }}
               component={Link}
               to="/adminRequest"
@@ -224,7 +225,128 @@ export default function Sidebar() {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Requests"
+                  primary="Applications"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "white",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+          {role === "admin" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("allemployee")
+                  ? "lightgray"
+                  : "transparent",
+              }}
+              component={Link}
+              to="/allemployee"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Employees"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "white",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+          {role === "admin" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("adduser") ? "lightgray" : "transparent",
+              }}
+              component={Link}
+              to="/adduser"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <PersonAddAlt1Icon
+                    sx={{ color: "white", fontSize: "28px" }}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Add User"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "white",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+          {role === "admin" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("allusers") ? "lightgray" : "transparent",
+              }}
+              component={Link}
+              to="/allusers"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="All User"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
@@ -267,7 +389,7 @@ export default function Sidebar() {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Requests"
+                  primary="Applications"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
@@ -329,12 +451,12 @@ export default function Sidebar() {
                 display: "block",
                 padding: { md: "0px 5px 0px 0px" },
                 color: "black",
-                background: isActive("allemployee")
+                background: isActive("agentemployee")
                   ? "lightgray"
                   : "transparent",
               }}
               component={Link}
-              to="/allemployee"
+              to="/agentemployee"
             >
               <ListItemButton
                 sx={{

@@ -32,17 +32,26 @@ const EmployeeSchema = new mongoose.Schema(
       type: String,
       required: [true, "please provide the phone number"],
     },
+    employeeId: {
+      type: String,
+      required: [true, "please provide the profile picture"],
+      default: "",
+    },
     profilePicture: {
       type: String,
       required: [true, "please provide the profile picture"],
       default: "",
     },
-    userId: {
+    cosignerId: {
+      type: String,
+      required: [true, "please provide the cosigner picture"],
+      default: "",
+    },
+    agentId: {
       type: mongoose.Types.ObjectId,
-      ref: "UserSchema",
+      ref: "AgentSchema",
       required: true,
     },
-    
   },
   { timestamps: true }
 );

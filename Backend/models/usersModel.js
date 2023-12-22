@@ -41,18 +41,14 @@ const UserSchema = new mongoose.Schema(
       minlength: [6, "password must be minimum length of 6"],
       required: [true, "please provide the password"],
     },
-    
+
     profilePicture: {
       type: String,
       required: [true, "please provide the profile picture"],
     },
     role: {
       type: String,
-      enum: {
-        values: roles,
-        message: "Invalid role. Choose from: " + roles.join(", "),
-      },
-      default: "user",
+      required: [true, "please provide the role"],
     },
   },
   { timestamps: true }
@@ -72,7 +68,7 @@ UserSchema.pre("save", async function (next) {
 
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, email: this.email, role:this.role },
+    { userId: this._id, email: this.email, role: this.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_LIFETIME }
   );

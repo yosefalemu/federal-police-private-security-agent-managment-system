@@ -85,8 +85,8 @@ const AdminRequest = () => {
   const handleConfirmRequest = () => {
     axios
       .patch(
-        `http://localhost:5000/api/v1/documents/checkdocument/${confirmId}`,
-        { checked: true },
+        `http://localhost:5000/api/v1/documents/acceptDocument/${confirmId}`,
+        null,
         { withCredentials: true }
       )
       .then((response) => {

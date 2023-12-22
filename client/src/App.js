@@ -11,6 +11,13 @@ import AddEmployeePage from "./pages/Agents/AddEmployeePage.jsx";
 import CreateUserPage from "./pages/AdminPages/CreateUserPage.jsx";
 import AgentFliesPage from "./pages/AgentFliesPage.jsx";
 import AdminFliePage from "./pages/AdminFilePage.jsx";
+import AgentsDetailPage from "./pages/AgentsDetailPage.jsx";
+import EmployeeDetailPage from "./pages/Agents/EmployeeDetailPage.jsx";
+import AgentEmployeePage from "./pages/AdminPages/AgentEmployeePage.jsx";
+import AllEmployeePage from "./pages/AdminPages/AllEmployeePage.jsx";
+import AddUserPage from "./pages/AdminPages/AddUserPage.jsx";
+import AllUsersPage from "./pages/AdminPages/AllUsersPage.jsx";
+import UserDetailPage from "./pages/AdminPages/UserDetailPage.jsx";
 
 function App() {
   return (
@@ -22,12 +29,19 @@ function App() {
         <Route path="/apply" element={<ApplyPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/agentslist" element={<AgentsListPage />} />
-        <Route path="/allemployee" element={<EmployeePage />} />
+        {/* <Route path="/allemployee" element={<EmployeePage />} /> */}
         <Route path="/agentemployee" element={<EmployeePage />} />
         <Route path="/addemployee" element={<AddEmployeePage />} />
         <Route path="/createuser" element={<CreateUserPage />} />
         <Route path="/agentsfile" element={<AgentFliesPage />} />
         <Route path="/adminfile" element={<AdminFliePage />} />
+        <Route path="/agentdetail" element={<AgentsDetailPage />} />
+        <Route path="/agentemployee/:id" element={<EmployeeDetailPage />} />
+        <Route path="/agentemployeepage/:id" element={<AgentEmployeePage />} />
+        <Route path="/allemployee" element={<AllEmployeePage />} />
+        <Route path="/adduser" element={<AddUserPage />} />
+        <Route path="/allusers" element={<AllUsersPage />} />
+        <Route path="/allusers/:id" element={<UserDetailPage />} />
       </Routes>
     </Router>
   );

@@ -69,6 +69,7 @@ const ApplyPage = () => {
   const [agentLogo, setAgentLogo] = useState("");
   const [agentFile, setAgentFile] = useState("");
   const [ownerFile, setOwnerFile] = useState("");
+  const [agentUniform, setAgentUniform] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [apply, setApply] = useState({
@@ -187,6 +188,29 @@ const ApplyPage = () => {
         console.log(error);
       });
   };
+  const uploadAgentsUniform = async (e) => {
+    e.preventDefault();
+    console.log("first");
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/users/uploadImage", formData)
+      .then((response) => {
+        console.log(response);
+        setAgentUniform(response.data.image);
+        toast.success("Agent's uniform uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
   const createDocument = () => {
     const address = {
       city: apply.city,
@@ -197,7 +221,14 @@ const ApplyPage = () => {
     console.log("agentFile", agentFile);
     console.log("ownerFile", ownerFile);
     console.log("profile picture", profilePicture);
-    if (!agentLogo || !agentFile || !ownerFile || !profilePicture) {
+    console.log("profile picture", agentUniform);
+    if (
+      !agentLogo ||
+      !agentFile ||
+      !ownerFile ||
+      !profilePicture ||
+      !agentUniform
+    ) {
       toast.error("Please upload all required files");
       return;
     }
@@ -213,6 +244,7 @@ const ApplyPage = () => {
       agentLogo: agentLogo,
       agentFile: agentFile,
       ownerFile: ownerFile,
+      agentUniform: agentUniform,
       profilePicture: profilePicture,
     };
     console.log(documentData);
@@ -428,6 +460,18 @@ const ApplyPage = () => {
                     type="file"
                     id="AgentsAdminProfilePicture"
                     onChange={uploadAgentsAdminProfilePicture}
+                    style={{ display: "none" }}
+                  />
+                </InputLabelContainer>
+              </InputContainer>
+              <InputContainer>
+                <Typography color={"#112846"}>Upload Agent Uniform</Typography>
+                <InputLabelContainer htmlFor="AgentsUniformUpload">
+                  <UploadFileIcon style={{ marginRight: "5px" }} />
+                  <Input
+                    type="file"
+                    id="AgentsUniformUpload"
+                    onChange={uploadAgentsUniform}
                     style={{ display: "none" }}
                   />
                 </InputLabelContainer>

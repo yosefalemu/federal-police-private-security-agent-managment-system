@@ -67,8 +67,9 @@ const logout = async (req, res) => {
 const getAllUsers = async (req, res) => {
   const users = await UserSchema.find({});
   if (users) {
-    res.status(201).json(users);
+    res.status(201).json({ users });
   } else {
+    throw new BadRequestError("No users yet");
   }
 };
 
@@ -79,8 +80,8 @@ const getSingleUser = async (req, res) => {
     if (!user) {
       throw new BadRequestError(`there is no user with id ${id}`);
     }
-    // checkPermissions(req.user, user._id);
-    res.status(201).json(user);
+    checkPermissions(req.user, user._id);
+    res.status(201).json({ user });
   } catch (error) {
     console.log(error);
   }
@@ -106,7 +107,8 @@ const updateUser = async (req, res) => {
 };
 const updateProfile = async (req, res) => {
   const id = req.params.id;
-  const { firstName, middleName, lastName, phoneNumber } = req.body;
+  const { firstName, middleName, lastName, phoneNumber, profilePicture } =
+    req.body;
   if (!firstName || !middleName || !lastName || !phoneNumber) {
     throw new CustomError.BadRequestError("Please provide all values");
   }
@@ -116,8 +118,7 @@ const updateProfile = async (req, res) => {
   user.middleName = middleName;
   user.lastName = lastName;
   user.phoneNumber = phoneNumber;
-
-  // user.profilePicture = profilePicture;
+  user.profilePicture = profilePicture;
 
   await user.save();
 

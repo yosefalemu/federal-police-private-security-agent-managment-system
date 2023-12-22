@@ -50,7 +50,11 @@ app.use(
     max: 60,
   })
 );
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 app.use(cors(corsOptions));
 app.use(xss());
 app.use(mongoSanitize());

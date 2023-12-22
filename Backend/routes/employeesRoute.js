@@ -5,21 +5,38 @@ const {
   authorizePermissions,
 } = require("../middlewares/authentication");
 const {
-    createEmployee,
+  createEmployee,
   getAllEmployees,
   getSingleEmployee,
+  getAgentEmployee,
   updateEmployee,
 } = require("../controllers/employeesController");
 
 router
   .route("/")
-  .get(authenticateUser, authorizePermissions("admin", "manager", "agent"), getAllEmployees);
+  .get(authenticateUser, authorizePermissions("admin"), getAllEmployees);
 
-router.route("/createEmployee").post(authenticateUser, authorizePermissions("agent"), createEmployee);
+router
+  .route("/:agentId")
+  .get(
+    authenticateUser,
+    authorizePermissions("agent", "admin"),
+    getAgentEmployee
+  );
+
+router
+  .route("/createEmployee")
+  .post(authenticateUser, authorizePermissions("agent"), createEmployee);
 router
   .route("/updateEmployee/:id")
   .patch(authenticateUser, authorizePermissions("agent"), updateEmployee);
 
-router.route("/:id").get(authenticateUser, authorizePermissions("admin", "agent", "manager"), getSingleEmployee);
+router
+  .route("/getsingle/:id")
+  .get(
+    authenticateUser,
+    authorizePermissions("admin", "agent"),
+    getSingleEmployee
+  );
 
 module.exports = router;

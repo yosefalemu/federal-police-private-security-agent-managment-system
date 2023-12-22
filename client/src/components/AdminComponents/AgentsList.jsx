@@ -9,18 +9,71 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
-import EditAgentModal from "./EditAgentModal";
-import DeleteAgentModal from "./DeleteAgentModal";
-import DetailAgentModal from "./DetailAgentModal";
-import React, { useState } from "react";
+import DescriptionIcon from "@mui/icons-material/Description";
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  setAdminFile,
+  setAgentFile,
+} from "../../redux-toolkit/slices/fileSilce";
+import GroupsIcon from "@mui/icons-material/Groups";
+import { setCurrentAgentId } from "../../redux-toolkit/slices/agents";
 
 const AgentsList = () => {
-  const [detailModal, setDetailModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [editModal, setEditModal] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [agents, setAgents] = useState([]);
+
+  useEffect(() => {
+    const getAllAgentsList = () => {
+      axios
+        .get("http://localhost:5000/api/v1/agents", {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response.data);
+          setAgents(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    getAllAgentsList();
+  }, []);
+
+  const handleSetAgentFile = (id) => {
+    console.log(id);
+    axios
+      .get(`http://localhost:5000/api/v1/documents/${id}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        dispatch(setAgentFile(response?.data?.agentFile));
+        navigate("/agentsfile");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleSetAdminFile = (id) => {
+    console.log(id);
+    axios
+      .get(`http://localhost:5000/api/v1/documents/${id}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        dispatch(setAdminFile(response?.data?.ownerFile));
+        navigate("/adminfile");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <Box>
       <TableContainer component={Paper} sx={{ bgcolor: "#f7f7f7" }}>
@@ -31,7 +84,7 @@ const AgentsList = () => {
                 sx={{
                   color: "#112846",
                   display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
+                  width: "15%",
                 }}
               >
                 Agent Name
@@ -40,599 +93,136 @@ const AgentsList = () => {
                 sx={{
                   color: "#112846",
                   display: { xs: "none", md: "table-cell" },
-                  width: "12%",
+                  width: "15%",
                 }}
               >
-                Manager Name
+                First Name
+              </TableCell>
+              <TableCell sx={{ color: "#112846", width: "15%" }}>
+                Middle Name
               </TableCell>
               <TableCell sx={{ color: "#112846", width: "12%" }}>
-                Email
+                Last Name
+              </TableCell>
+              <TableCell
+                sx={{
+                  color: "#112846",
+                  width: "10%",
+                  textAlign: "center",
+                }}
+              >
+                Phone
               </TableCell>
               <TableCell
                 sx={{
                   color: "#112846",
                   display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
+                  width: "5%",
                 }}
               >
-                Phone Number
-              </TableCell>
-              <TableCell
-                sx={{
-                  color: "#112846",
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                Address
-              </TableCell>
-              <TableCell
-                sx={{
-                  color: "#112846",
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                Employees Num
-              </TableCell>
-              <TableCell sx={{ color: "#112846", width: "3%" }}>Edit</TableCell>
-              <TableCell sx={{ color: "#112846", width: "3%" }}>
                 Details
+              </TableCell>
+              <TableCell
+                sx={{
+                  color: "#112846",
+                  width: "12%",
+                }}
+              >
+                Agent File
+              </TableCell>
+              <TableCell sx={{ color: "#112846", width: "12%" }}>
+                Admin File
+              </TableCell>
+              <TableCell sx={{ color: "#112846", width: "5%" }}>
+                Employees
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
+            {agents?.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell
+                  sx={{
+                    width: "15%",
+                  }}
                 >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
+                  {item.agentName}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: "15%",
+                  }}
                 >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
+                  {item.firstName}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: "15%",
+                  }}
                 >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
+                  {item.middleName}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: "12%",
+                  }}
                 >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
+                  {item.lastName}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: "10%",
+                  }}
                 >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
-                >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
-                >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
-                >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
-                >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
-                >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  display: { xs: "none", sm: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", md: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell>test</TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: { xs: "none", lg: "table-cell" },
-                  width: "12%",
-                }}
-              >
-                test
-              </TableCell>
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "#EF9630" }}
-                  onClick={() => setEditModal(true)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-
-              <TableCell sx={{ width: "3%" }}>
-                <IconButton
-                  sx={{ color: "blue" }}
-                  onClick={() => setDetailModal(true)}
-                >
-                  <SettingsAccessibilityIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
+                  {item.phoneNumber}
+                </TableCell>
+                <TableCell sx={{ width: "5%", textAlign: "center" }}>
+                  <IconButton
+                    sx={{ color: "#EF9630" }}
+                    onClick={() => {
+                      dispatch(setCurrentAgentId(item._id));
+                      navigate("/agentdetail");
+                    }}
+                  >
+                    <SettingsAccessibilityIcon />
+                  </IconButton>
+                </TableCell>
+                <TableCell sx={{ width: "12%", textAlign: "center" }}>
+                  <IconButton
+                    sx={{ color: "#EF9630" }}
+                    onClick={() => {
+                      handleSetAgentFile(item?.documentId);
+                    }}
+                  >
+                    <DescriptionIcon />
+                  </IconButton>
+                </TableCell>
+                <TableCell sx={{ width: "12%", textAlign: "center" }}>
+                  <IconButton
+                    sx={{ color: "#EF9630" }}
+                    onClick={() => {
+                      handleSetAdminFile(item?.documentId);
+                    }}
+                  >
+                    <DescriptionIcon />
+                  </IconButton>
+                </TableCell>
+                <TableCell sx={{ width: "12%", textAlign: "center" }}>
+                  <IconButton
+                    sx={{ color: "#EF9630" }}
+                    onClick={() => {
+                      dispatch(setCurrentAgentId(item._id));
+                      navigate(`/agentemployeepage/${item._id}`);
+                    }}
+                  >
+                    <GroupsIcon sx={{ fontSize: 30 }} />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <EditAgentModal editModal={editModal} setEditModal={setEditModal} />
-      <DetailAgentModal
-        detailModal={detailModal}
-        setDetailModal={setDetailModal}
-      />
-      <DeleteAgentModal
-        deleteModal={deleteModal}
-        setDeleteModal={setDeleteModal}
-      />
     </Box>
   );
 };

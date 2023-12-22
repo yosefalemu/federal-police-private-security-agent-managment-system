@@ -40,11 +40,7 @@ router
   .get(authenticateUser, authorizePermissions("admin"), findcheckedDocuments);
 router
   .route("/acceptDocument/:id")
-  .patch(
-    authenticateUser,
-    authorizePermissions("admin", "manager"),
-    acceptDocument
-  );
+  .patch(authenticateUser, authorizePermissions("admin"), acceptDocument);
 router
   .route("/rejectDocument/:id")
   .delete(

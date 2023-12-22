@@ -55,10 +55,12 @@ const getSingleDocument = async (req, res) => {
 const acceptDocument = async (req, res) => {
   const id = req.params.id;
   const document = await DocumentSchema.findById(id);
+  console.log("document", document);
   const {
     _id,
     agentName,
     agentLogo,
+    agentUniform,
     firstName,
     middleName,
     lastName,
@@ -106,6 +108,7 @@ const acceptDocument = async (req, res) => {
     userId: user._id,
     agentName,
     agentLogo,
+    agentUniform,
     firstName,
     middleName,
     lastName,
@@ -182,7 +185,10 @@ const findUncheckedDocuments = async (req, res) => {
   res.status(StatusCodes.OK).json({ documents: documents });
 };
 const findcheckedDocuments = async (req, res) => {
-  const documents = await DocumentSchema.find({ checked: true });
+  const documents = await DocumentSchema.find({
+    checked: true,
+    status: "pending",
+  });
   if (!documents) {
     throw new BadRequestError("No new request");
   }

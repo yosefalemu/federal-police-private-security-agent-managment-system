@@ -65,7 +65,15 @@ const LogInPage = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <Box>
         <LoginHeader />
       </Box>

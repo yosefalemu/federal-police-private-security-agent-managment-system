@@ -7,16 +7,17 @@ const {
 const {
   getAllAgents,
   getSingleAgent,
+  getAgentWithEmail,
   updateAgent,
 } = require("../controllers/securityAgentsController");
 
 router
   .route("/")
-  .get(
-    authenticateUser,
-    authorizePermissions("admin", "manager"),
-    getAllAgents
-  );
+  .get(authenticateUser, authorizePermissions("admin"), getAllAgents);
+
+router
+  .route("/getagentwithemail/:email")
+  .get(authenticateUser, authorizePermissions("agent"), getAgentWithEmail);
 
 router
   .route("/updateAgent/:id")
@@ -24,10 +25,6 @@ router
 
 router
   .route("/:id")
-  .get(
-    authenticateUser,
-    authorizePermissions("admin", "manager"),
-    getSingleAgent
-  );
+  .get(authenticateUser, authorizePermissions("admin"), getSingleAgent);
 
 module.exports = router;

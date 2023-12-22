@@ -19,6 +19,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
 const UpdateButton = styled(Button)({
@@ -34,6 +35,8 @@ const ProfilePage = () => {
   const [image, setImage] = useState(null);
   const [user, setUser] = useState({});
   const [profileInfo, setProfileInfo] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
   const userInformation = [
     { label: "First Name", value: user?.firstName },
     { label: "Middle Name", value: user?.middleName },
@@ -46,6 +49,33 @@ const ProfilePage = () => {
   const { _id } = useSelector((state) => state.user.user);
   console.log("user", user);
   console.log("profileInfo", profileInfo);
+  const handleImageUpload = (e) => {
+    e.preventDefault();
+    const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    setLoading(true);
+
+    axios
+      .post("http://localhost:5000/api/v1/users/uploadImage", formData)
+      .then((response) => {
+        console.log(response);
+        setProfilePicture(response.data.image);
+        setImage(URL.createObjectURL(file));
+        toast.success("Employee profile picture uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -75,20 +105,33 @@ const ProfilePage = () => {
   }, []);
 
   const handleUpdateProfile = () => {
+    const updateData = {
+      firstName: user.firstName,
+      middleName: user.middleName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+      profilePicture: profilePicture,
+    };
+    console.log("updated data", updateData);
     axios
       .patch(
         `http://localhost:5000/api/v1/users/updateProfile/${_id}`,
-        profileInfo,
+        updateData,
         { withCredentials: true }
       )
       .then((response) => {
         setUser(response.data.user);
         console.log(response.data);
+        toast.success("Profile updated successfully");
       })
       .catch((error) => {
         console.log(error);
+        toast.error("Error while updating profile");
       });
   };
+  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+
+  console.log("images", `${PF}uploads/${user?.profilePicture}`);
 
   return (
     <>
@@ -127,16 +170,20 @@ const ProfilePage = () => {
                       height: "100%",
                     }}
                   >
-                    <Avatar
-                      alt="User Image"
-                      src={user.profilePicture}
-                      sx={{
-                        width: { xs: 100, md: 120, xl: 150 },
-                        height: { xs: 100, md: 120, xl: 150 },
-                        alignSelf: "center",
-                        marginBottom: 4,
-                      }}
-                    />
+                    {user?.profilePicture && (
+                      <Avatar
+                        alt="User Image"
+                        src={`${PF}uploads/${user?.profilePicture}`}
+                        crossOrigin="anonymous"
+                        sx={{
+                          width: { xs: 100, md: 120, xl: 150 },
+                          height: { xs: 100, md: 120, xl: 150 },
+                          alignSelf: "center",
+                          marginBottom: 4,
+                        }}
+                      />
+                    )}
+
                     <TableContainer sx={{ width: "100%" }}>
                       <Table>
                         <TableBody>
@@ -214,18 +261,19 @@ const ProfilePage = () => {
                         flexDirection: "column",
                         justifyContent: "space-around",
                         alignItems: "center",
-                        border: "2px dashed #667378",
+                        border: "2px dashed #97dce6",
                         height: "130px",
                         width: "130px",
                         cursor: "pointer",
                         borderRadius: "5px",
+                        cursor: "pointer",
                         margin: "1.5rem auto",
                       }}
                       onMouseEnter={(event) => {
-                        event.target.style.border = "2px solid #667378";
+                        event.target.style.border = "2px solid #97dce6";
                       }}
                       onMouseLeave={(event) => {
-                        event.target.style.border = "2px dashed #667378";
+                        event.target.style.border = "2px dashed #97dce6";
                       }}
                     >
                       <label
@@ -239,21 +287,7 @@ const ProfilePage = () => {
                           type="file"
                           accept="image/*"
                           style={{ display: "none" }}
-                          onChange={(e) => {
-                            const file = e.target.files[0];
-                            // setFileName(file?.name);
-
-                            if (file) {
-                              const reader = new FileReader();
-
-                              reader.onload = (event) => {
-                                const imageUrl = event.target.result;
-                                setImage(imageUrl);
-                              };
-
-                              reader.readAsDataURL(file);
-                            }
-                          }}
+                          onChange={(e) => handleImageUpload(e)}
                         />
                         {image ? (
                           <img
@@ -273,7 +307,7 @@ const ProfilePage = () => {
                           >
                             <CloudUploadIcon
                               style={{
-                                color: "#667378",
+                                color: "#12596B",
                                 fontSize: 50,
                                 cursor: "pointer",
                               }}

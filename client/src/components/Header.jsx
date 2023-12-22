@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -17,6 +17,9 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import { useAppStore } from "../appStore";
 import { Avatar } from "@mui/material";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const AppBar = styled(
   MuiAppBar,
@@ -51,24 +54,11 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   justifyContent: "center",
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: " calc(1em + ${theme.spacing(4)})",
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
-
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-  const updateOpen = useAppStore((state) => state.updateOpen);
-  const dopen = useAppStore((state) => state.dopen);
+  const [user, setUser] = React.useState({});
+  const { _id } = useSelector((state) => state.user.user);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -90,6 +80,22 @@ export default function Header() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/v1/users/${_id}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setUser(response.data);
+        console.log("nav bar", response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -107,8 +113,9 @@ export default function Header() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
+        Profile
+      </MenuItem>
     </Menu>
   );
 
@@ -219,7 +226,11 @@ export default function Header() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <AccountCircle sx={{ color: "gray" }} />
+              <Avatar
+                alt="Profile"
+                src={`${PF}uploads/${user.profilePicture}`}
+                sx={{ width: 50, height: 50 }}
+              />
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
