@@ -89,7 +89,7 @@ const acceptDocument = async (req, res) => {
   sendNotificationEmail({
     email: email,
     subject: "Approval of your document",
-    text: password,
+    text: `Congradulations your application is approved, you can login as an agent using your email and this password:${password}`,
   });
   const user = await UserSchema.create({
     firstName,
