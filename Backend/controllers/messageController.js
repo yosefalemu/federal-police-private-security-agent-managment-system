@@ -1,7 +1,6 @@
-const Message = require("../models/feedbackModel");
+const Message = require("../models/messageModel");
 const { BadRequestError } = require("../errors");
-const socketIo = require("../path/to/your/socket");
-
+const socketIo = require("../socket");
 
 const createMessage = async (req, res) => {
   const newMessage = new Message(req.body);
@@ -15,7 +14,6 @@ const createMessage = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 
 const getMessages = async (req, res) => {
   try {

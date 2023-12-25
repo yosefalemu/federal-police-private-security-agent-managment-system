@@ -1,6 +1,6 @@
-const Conversation = require("../models/feedbackModel");
+const Conversation = require("../models/conversationModel");
 const { BadRequestError } = require("../errors");
-const socketIo = require("../path/to/your/socket");
+const socketIo = require("../socket");
 
 const createConversation = async (req, res) => {
   const newConversation = new Conversation({
@@ -46,6 +46,7 @@ const getConversationTwoUsers = async (req, res) => {
     res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
+    throw new BadRequestError("The two users doesn't have conversations")
   }
 };
 

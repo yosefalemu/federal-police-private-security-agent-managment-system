@@ -25,24 +25,24 @@ const userRouter = require("./routes/userRoutes");
 const employeeRouter = require("./routes/employeesRoute");
 const agentRouter = require("./routes/securityAgentRoutes");
 const documentRouter = require("./routes/documentRoutes");
-const messageRouter = require("./routes/messageRoute")
-const conversationRouter = require("./routes/conversationRoute")
+const messageRouter = require("./routes/messageRoute");
+const conversationRouter = require("./routes/conversationRoute");
 
 // middleware
 const notFoundMiddleware = require("./middlewares/not-found");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 // Add this middleware to your Express app
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+//   res.header("Access-Control-Allow-Credentials", true);
+//   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 const corsOptions = {
   origin: "http://localhost:3000",
   credentials: true,
@@ -75,14 +75,12 @@ app.use("/api/v1/employees", employeeRouter);
 app.use("/api/v1/agents", agentRouter);
 app.use("/api/v1/documents", documentRouter);
 app.use("/api/v1/conversation", conversationRouter);
-app.use("/api/v1/message", messageRouter)
+app.use("/api/v1/message", messageRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5000;
-
-
 
 const start = async () => {
   try {
