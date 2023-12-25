@@ -1,8 +1,11 @@
 const UserSchema = require("../models/usersModel");
 const EmployeeSchema = require("../models/employeesModel");
-const { BadRequestError, UnauthenticatedError } = require("../errors");
+const {
+  BadRequestError,
+  UnauthenticatedError,
+  CustomError,
+} = require("../errors");
 const { StatusCodes } = require("http-status-codes");
-const CustomError = require("../errors");
 const { checkPermissions } = require("../utils");
 
 const createEmployee = async (req, res) => {

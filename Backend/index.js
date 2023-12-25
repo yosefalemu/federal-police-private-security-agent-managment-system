@@ -2,9 +2,12 @@ require("dotenv").config();
 require("express-async-errors");
 // express
 
+const http = require("http");
+const socketIo = require("./socket");
 const express = require("express");
 const app = express();
-// rest of the packages
+const server = http.createServer(app);
+socketIo.initSocket(server);
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
@@ -13,7 +16,6 @@ const helmet = require("helmet");
 const xss = require("xss-clean");
 const cors = require("cors");
 const mongoSanitize = require("express-mongo-sanitize");
-
 // database
 const connectDB = require("./database/connect");
 
@@ -23,6 +25,8 @@ const userRouter = require("./routes/userRoutes");
 const employeeRouter = require("./routes/employeesRoute");
 const agentRouter = require("./routes/securityAgentRoutes");
 const documentRouter = require("./routes/documentRoutes");
+const messageRouter = require("./routes/messageRoute")
+const conversationRouter = require("./routes/conversationRoute")
 
 // middleware
 const notFoundMiddleware = require("./middlewares/not-found");
@@ -70,11 +74,16 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/employees", employeeRouter);
 app.use("/api/v1/agents", agentRouter);
 app.use("/api/v1/documents", documentRouter);
+app.use("/api/v1/conversation", conversationRouter);
+app.use("/api/v1/message", messageRouter)
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5000;
+
+
+
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URL);
