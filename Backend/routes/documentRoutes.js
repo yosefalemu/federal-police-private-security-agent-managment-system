@@ -45,7 +45,7 @@ router
   .route("/rejectDocument/:id")
   .delete(
     authenticateUser,
-    authorizePermissions("admin", "manager"),
+    authorizePermissions("admin", "screener"),
     rejectDocument
   );
 router.route("/:id").get(authenticateUser, getSingleDocument);

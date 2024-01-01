@@ -83,7 +83,7 @@ const UserDetails = () => {
             </Box>
             <Box sx={{ width: "300px", height: "300px" }}>
               <img
-                src={`${PF}uploads/${user.profilePicture}`}
+                src={`${PF}uploads/${user?.profilePicture}`}
                 alt="test"
                 crossOrigin="anonymous"
                 style={{
@@ -115,7 +115,7 @@ const UserDetails = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={400}
               >
-                {user.firstName}
+                {user?.firstName}
               </Typography>
             </ListItemForModal>
             <ListItemForModal>
@@ -133,7 +133,7 @@ const UserDetails = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={400}
               >
-                {user.middleName}
+                {user?.middleName}
               </Typography>
             </ListItemForModal>
             <ListItemForModal>
@@ -151,7 +151,7 @@ const UserDetails = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={400}
               >
-                {user.lastName}
+                {user?.lastName}
               </Typography>
             </ListItemForModal>
             <ListItemForModal>
@@ -169,7 +169,7 @@ const UserDetails = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={400}
               >
-                {user.email}
+                {user?.email}
               </Typography>
             </ListItemForModal>
             <ListItemForModal>
@@ -187,7 +187,7 @@ const UserDetails = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={400}
               >
-                {user.phoneNumber}
+                {user?.phoneNumber}
               </Typography>
             </ListItemForModal>
           </List>

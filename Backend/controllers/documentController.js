@@ -125,7 +125,8 @@ const acceptDocument = async (req, res) => {
 const rejectDocument = async (req, res) => {
   const { id: documentId } = req.params;
 
-  const { subject, text } = req.body;
+  const subject = "Rejection of application";
+  const { text } = req.body;
   const document = await DocumentSchema.findByIdAndDelete({ _id: documentId });
   const { email } = document;
   console.log(email);

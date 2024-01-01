@@ -28,6 +28,7 @@ import {
   setConfirmId,
 } from "../../redux-toolkit/slices/fileSilce";
 import toast from "react-hot-toast";
+import { setCurrentDocument } from "../../redux-toolkit/slices/document";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -212,7 +213,14 @@ const AdminRequest = () => {
                   {item.phoneNumber}
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
-                  <IconButton sx={{ color: "#EF9630" }}>
+                  <IconButton
+                    sx={{ color: "#EF9630" }}
+                    component={Link}
+                    to="/applicationdetail"
+                    onClick={() => {
+                      dispatch(setCurrentDocument(item._id));
+                    }}
+                  >
                     <SettingsAccessibilityIcon />
                   </IconButton>
                 </TableCell>

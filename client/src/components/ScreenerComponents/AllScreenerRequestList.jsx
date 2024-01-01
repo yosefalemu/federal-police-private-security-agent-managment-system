@@ -10,6 +10,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
   styled,
 } from "@mui/material";
@@ -20,6 +21,7 @@ import ArticleIcon from "@mui/icons-material/Article";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import Textarea from "@mui/joy/Textarea";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,6 +30,7 @@ import {
   setConfirmId,
 } from "../../redux-toolkit/slices/fileSilce";
 import toast from "react-hot-toast";
+import { setCurrentDocument } from "../../redux-toolkit/slices/document";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -35,6 +38,18 @@ const ConfirmModalContainer = styled(Modal)({
   justifyContent: "center",
 });
 const ConfirmModalWrapper = styled(Box)({
+  background: "#fff",
+  height: "fit-content",
+  borderRadius: "5px",
+  padding: "20px",
+});
+
+const DeclineModalContainer = styled(Modal)({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+const DeclineModalWrapper = styled(Box)({
   background: "#fff",
   height: "fit-content",
   borderRadius: "5px",
@@ -65,6 +80,7 @@ const AllScreenerRequestList = () => {
   const [allRequests, setAllRequests] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
   const [declineModal, setDeclineModal] = useState(false);
+  const [rejectionReason, setRejectReason] = useState("");
   useEffect(() => {
     const getAllRequestScreenerRequestList = () => {
       axios
@@ -87,6 +103,29 @@ const AllScreenerRequestList = () => {
       .patch(
         `http://localhost:5000/api/v1/documents/checkdocument/${confirmId}`,
         { checked: true },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        console.log(response);
+        toast.success("request done successfully");
+        setTimeout(() => {
+          setConfirmModal(false);
+        }, 4000);
+      })
+      .catch((error) => {
+        toast.error("error while requesting");
+        setTimeout(() => {
+          setConfirmModal(false);
+        }, 4000);
+        console.log(error);
+      });
+  };
+
+  const handleDeclinedRequest = () => {
+    axios
+      .patch(
+        `http://localhost:5000/api/v1/documents/rejectDocument/${confirmId}`,
+        { text: rejectionReason },
         { withCredentials: true }
       )
       .then((response) => {
@@ -212,7 +251,14 @@ const AllScreenerRequestList = () => {
                   {item.phoneNumber}
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
-                  <IconButton sx={{ color: "#EF9630" }}>
+                  <IconButton
+                    sx={{ color: "#EF9630" }}
+                    component={Link}
+                    to="/applicationdetail"
+                    onClick={() => {
+                      dispatch(setCurrentDocument(item._id));
+                    }}
+                  >
                     <SettingsAccessibilityIcon />
                   </IconButton>
                 </TableCell>
@@ -252,7 +298,13 @@ const AllScreenerRequestList = () => {
                   </IconButton>
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
-                  <IconButton sx={{ color: "red" }}>
+                  <IconButton
+                    sx={{ color: "red" }}
+                    onClick={() => {
+                      dispatch(setConfirmId(item?._id));
+                      setDeclineModal(true);
+                    }}
+                  >
                     <DeleteForeverIcon />
                   </IconButton>
                 </TableCell>
@@ -295,6 +347,36 @@ const AllScreenerRequestList = () => {
           </Box>
         </ConfirmModalWrapper>
       </ConfirmModalContainer>
+      <DeclineModalContainer
+        open={declineModal}
+        onClose={() => setDeclineModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <DeclineModalWrapper
+          width={{ xs: "90%", sm: "70%", md: "50%", lg: "35%" }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              gap: "15px",
+              flexDirection: "column",
+            }}
+          >
+            <Typography>Decline Reason</Typography>
+            <Textarea
+              minRows={5}
+              sx={{ fontSize: "18px", marginBottom: "20px" }}
+              placeholder="Send to decline reason to manager"
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+
+            <ConfirmButton variant="contained" onClick={handleDeclinedRequest}>
+              Confirm
+            </ConfirmButton>
+          </Box>
+        </DeclineModalWrapper>
+      </DeclineModalContainer>
     </Box>
   );
 };

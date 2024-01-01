@@ -27,8 +27,6 @@ router
 router.route("/updateProfile/:id").patch(authenticateUser, updateProfile);
 router.route("/updateUserPassword").patch(authenticateUser, updateUserPassword);
 
-router
-  .route("/getsingle/:id")
-  .get(authenticateUser, authorizePermissions("admin"), getSingleUser);
+router.route("/getsingle/:id").get(authenticateUser, getSingleUser);
 
 module.exports = router;
