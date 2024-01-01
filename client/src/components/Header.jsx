@@ -177,12 +177,12 @@ export default function Header() {
         position="fixed"
         elevation={1}
         style={{
-          backgroundColor: "#112846",
+          backgroundColor: "#fff",
           color: "black",
           height: "70px",
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <IconButton
             size="large"
             aria-label="account of current user"
@@ -201,7 +201,7 @@ export default function Header() {
             color="success"
             noWrap
             component="div"
-            sx={{ display: { xs: "none", sm: "block", color: "white" } }}
+            sx={{ display: { xs: "none", sm: "block", color: "#112846" } }}
           >
             Private Security Agent HR Managment System
           </Typography>

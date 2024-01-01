@@ -36,6 +36,7 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body);
   if (!email) {
     throw new BadRequestError("email required");
   }
@@ -43,6 +44,7 @@ const loginUser = async (req, res) => {
     throw new BadRequestError("password required");
   }
   const user = await UserSchema.findOne({ email });
+  console.log(user);
   if (!user) {
     throw new UnauthenticatedError("Invalid creditials");
   }
@@ -81,7 +83,7 @@ const getSingleUser = async (req, res) => {
       throw new BadRequestError(`there is no user with id ${id}`);
     }
     checkPermissions(req.user, user._id);
-    res.status(201).json({ user });
+    res.status(201).json(user);
   } catch (error) {
     console.log(error);
   }

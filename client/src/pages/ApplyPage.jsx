@@ -15,6 +15,10 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import toast from "react-hot-toast";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
+import ApplyHeader from "../components/ApplyHeader";
+import { Link } from "react-router-dom";
+
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 const FileContainer = styled(Box)({
   display: "flex",
@@ -267,6 +271,7 @@ const ApplyPage = () => {
 
   return (
     <Container>
+      <ApplyHeader />
       <Box
         sx={{
           display: "flex",
@@ -275,8 +280,29 @@ const ApplyPage = () => {
           justifyContent: "center",
           height: "100vh",
           margin: "auto",
+          position: "relative",
         }}
       >
+        <Box
+          component={Link}
+          to="/"
+          sx={{
+            position: "absolute",
+            top: "80px",
+            left: "20px",
+            background: "#112846",
+            color: "#fff",
+            textDecoration: "none",
+            padding: "10px 20px 10px 10px",
+            borderRadius: "5px",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <KeyboardBackspaceIcon />
+          Back
+        </Box>
         <Typography
           fontSize={42}
           marginBottom={2}

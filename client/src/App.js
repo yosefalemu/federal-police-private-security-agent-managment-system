@@ -18,6 +18,7 @@ import AllEmployeePage from "./pages/AdminPages/AllEmployeePage.jsx";
 import AddUserPage from "./pages/AdminPages/AddUserPage.jsx";
 import AllUsersPage from "./pages/AdminPages/AllUsersPage.jsx";
 import UserDetailPage from "./pages/AdminPages/UserDetailPage.jsx";
+import ApplicationDetail from "./pages/Screener/ApplicationDetail.jsx";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path="/adduser" element={<AddUserPage />} />
         <Route path="/allusers" element={<AllUsersPage />} />
         <Route path="/allusers/:id" element={<UserDetailPage />} />
+        <Route path="/applicationdetail" element={<ApplicationDetail />} />
       </Routes>
     </Router>
   );

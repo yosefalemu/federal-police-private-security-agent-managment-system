@@ -86,7 +86,7 @@ const ProfilePage = () => {
   };
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/v1/users/${_id}`, {
+      .get(`http://localhost:5000/api/v1/users/getsingle/${_id}`, {
         withCredentials: true,
       })
       .then((response) => {

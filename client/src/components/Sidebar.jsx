@@ -31,7 +31,7 @@ const drawerWidth = "180px";
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
-  background: "#112846",
+  background: "#fff",
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
@@ -83,7 +83,7 @@ const LogOutContainer = styled(ListItem)({
   position: "absolute",
   bottom: "0",
   left: "0",
-  borderTop: "1px solid white",
+  borderTop: "1px solid #112846",
 });
 
 export default function Sidebar() {
@@ -139,14 +139,14 @@ export default function Sidebar() {
                   justifyContent: "center",
                 }}
               >
-                <PersonIcon sx={{ color: "white", fontSize: "28px" }} />
+                <PersonIcon sx={{ color: "#112846", fontSize: "28px" }} />
               </ListItemIcon>
               <ListItemText
                 primary="Profile"
                 sx={{
                   opacity: open ? 1 : 0,
                   display: { xs: "none", md: "block" },
-                  color: "white",
+                  color: "#112846",
                 }}
               />
             </ListItemButton>
@@ -179,14 +179,14 @@ export default function Sidebar() {
                     justifyContent: "center",
                   }}
                 >
-                  <SecurityIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <SecurityIcon sx={{ color: "#112846", fontSize: "28px" }} />
                 </ListItemIcon>
                 <ListItemText
                   primary="Agents"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -221,7 +221,7 @@ export default function Sidebar() {
                   }}
                 >
                   <FormatListNumberedIcon
-                    sx={{ color: "white", fontSize: "28px" }}
+                    sx={{ color: "#112846", fontSize: "28px" }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -229,7 +229,7 @@ export default function Sidebar() {
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -263,14 +263,14 @@ export default function Sidebar() {
                     justifyContent: "center",
                   }}
                 >
-                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <GroupsIcon sx={{ color: "#112846", fontSize: "28px" }} />
                 </ListItemIcon>
                 <ListItemText
                   primary="Employees"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -303,7 +303,7 @@ export default function Sidebar() {
                   }}
                 >
                   <PersonAddAlt1Icon
-                    sx={{ color: "white", fontSize: "28px" }}
+                    sx={{ color: "#112846", fontSize: "28px" }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -311,7 +311,7 @@ export default function Sidebar() {
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -343,14 +343,14 @@ export default function Sidebar() {
                     justifyContent: "center",
                   }}
                 >
-                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <GroupsIcon sx={{ color: "#112846", fontSize: "28px" }} />
                 </ListItemIcon>
                 <ListItemText
                   primary="All User"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -385,7 +385,7 @@ export default function Sidebar() {
                   }}
                 >
                   <FormatListNumberedIcon
-                    sx={{ color: "white", fontSize: "28px" }}
+                    sx={{ color: "#112846", fontSize: "28px" }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -393,7 +393,7 @@ export default function Sidebar() {
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -429,7 +429,7 @@ export default function Sidebar() {
                   }}
                 >
                   <PersonAddAlt1Icon
-                    sx={{ color: "white", fontSize: "28px" }}
+                    sx={{ color: "#112846", fontSize: "28px" }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -437,7 +437,7 @@ export default function Sidebar() {
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
@@ -472,14 +472,14 @@ export default function Sidebar() {
                     justifyContent: "center",
                   }}
                 >
-                  <GroupsIcon sx={{ color: "white", fontSize: "28px" }} />
+                  <GroupsIcon sx={{ color: "#112846", fontSize: "28px" }} />
                 </ListItemIcon>
                 <ListItemText
                   primary="Employees"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },
-                    color: "white",
+                    color: "#112846",
                   }}
                 />
               </ListItemButton>
