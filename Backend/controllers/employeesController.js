@@ -6,26 +6,45 @@ const {
   CustomError,
 } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
-const { checkPermissions } = require("../utils");
 
 const createEmployee = async (req, res) => {
-  // req.body.userId = req.user.userId;
-  const { email } = req.body;
+  const { nationalId } = req.body;
+  const status = "employeed";
   const employeeExists = await EmployeeSchema.findOne({
-    email: email,
+    nationalId: nationalId,
+    status: status,
   });
   if (employeeExists) {
-    throw new BadRequestError("email taken");
+    throw new BadRequestError(
+      "Employee has previous records. Please contact us."
+    );
+  }
+  const freeEmployeeExist = await EmployeeSchema.findOne({
+    nationalId: nationalId,
+  });
+  if (freeEmployeeExist) {
+    const employeeUpdated = req.body;
+    employeeUpdated.status = "employeed";
+    console.log("employee to be updated", employeeUpdated);
+    const updatedEmployee = await EmployeeSchema.findOneAndUpdate(
+      {
+        nationalId: nationalId,
+      },
+      employeeUpdated,
+      { runValidators: true, new: true }
+    );
+    res.status(StatusCodes.CREATED).json({ updatedEmployee });
+    return;
   }
   const employee = await EmployeeSchema.create(req.body);
 
-  if (employee) {
-    await employee.save();
-    res.status(StatusCodes.CREATED).json({ employee });
-  } else {
-    res.status(400);
-    throw new BadRequestError("Invalid Employee data");
+  if (!employee) {
+    throw new BadRequestError(
+      "Unable to create an employee. Please provide all the required information and try again."
+    );
   }
+  await employee.save();
+  res.status(StatusCodes.CREATED).json({ employee });
 };
 
 const getAllEmployees = async (req, res) => {
@@ -53,10 +72,13 @@ const getSingleEmployee = async (req, res) => {
 
 const updateEmployee = async (req, res) => {
   const { id: employeeId } = req.params;
+  const { employees } = req.body;
+
+  console.log(employees);
 
   const employee = await EmployeeSchema.findOneAndUpdate(
     { _id: employeeId },
-    req.body,
+    employees,
     {
       new: true,
       runValidators: true,

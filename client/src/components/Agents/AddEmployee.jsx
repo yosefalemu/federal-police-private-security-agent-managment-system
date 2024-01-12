@@ -39,6 +39,7 @@ const AddEmployee = () => {
     lastName: "",
     email: "",
     phoneNumber: "",
+    nationalId: "",
   });
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -163,6 +164,7 @@ const AddEmployee = () => {
       lastName: user.lastName,
       email: user.email,
       phoneNumber: user.phoneNumber,
+      nationalId: user.nationalId,
       employeeId: employeeId,
       profilePicture: profilePicture,
       cosignerId: cosignerId,
@@ -186,6 +188,7 @@ const AddEmployee = () => {
           lastName: "",
           email: "",
           phoneNumber: "",
+          nationalId: "",
         });
         setImage(null);
         setEmergencyImage(null);
@@ -241,6 +244,14 @@ const AddEmployee = () => {
                   label="Last Name"
                   name="lastName"
                   value={user.lastName}
+                  onChange={handleFormChange}
+                  sx={{ backgroundColor: "#F6F5F5", marginTop: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="National Id"
+                  name="nationalId"
+                  value={user.nationalId}
                   onChange={handleFormChange}
                   sx={{ backgroundColor: "#F6F5F5", marginTop: 3 }}
                 />

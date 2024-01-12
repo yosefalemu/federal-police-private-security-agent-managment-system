@@ -17,6 +17,7 @@ const UserDetails = () => {
   const dispatch = useDispatch();
   const [user, setUser] = useState({});
   const { currentAgentId } = useSelector((state) => state.agent);
+  const { role } = useSelector((state) => state.user.user);
   console.log(id);
   useEffect(() => {
     const getSingleAgentEmployee = () => {
@@ -26,7 +27,7 @@ const UserDetails = () => {
         })
         .then((response) => {
           console.log(response);
-          setUser(response.data.user);
+          setUser(response.data);
         })
         .catch((error) => {
           console.log(error);
@@ -190,6 +191,44 @@ const UserDetails = () => {
                 {user?.phoneNumber}
               </Typography>
             </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
+                Role:
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {user?.role}
+              </Typography>
+            </ListItemForModal>
+            {role === "admin" && (
+              <ListItemForModal>
+                <Typography
+                  variant="h6"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={500}
+                >
+                  National Id:
+                </Typography>
+                <Typography
+                  variant="body1"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={400}
+                >
+                  {user?.nationalId}
+                </Typography>
+              </ListItemForModal>
+            )}
           </List>
         </Box>
       </Box>

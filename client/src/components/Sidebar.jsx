@@ -21,6 +21,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import ChatIcon from "@mui/icons-material/Chat";
 
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -93,7 +94,7 @@ export default function Sidebar() {
   const location = useLocation();
   const { role } = useSelector((state) => state.user.user);
 
-  const isActive = (route) => location.pathname === `/${route}`;
+  const isActive = (route) => location.pathname.startsWith(`/${route}`);
 
   const handleLogOut = () => {
     navigate("/");
@@ -356,6 +357,47 @@ export default function Sidebar() {
               </ListItemButton>
             </ListItem>
           )}
+
+          {role === "admin" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("chat") ? "lightgray" : "transparent",
+              }}
+              component={Link}
+              to="/chat"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ChatIcon sx={{ color: "#112846", fontSize: "28px" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Chat"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "#112846",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+
           {role === "screener" && (
             <ListItem
               disablePadding
@@ -476,6 +518,46 @@ export default function Sidebar() {
                 </ListItemIcon>
                 <ListItemText
                   primary="Employees"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "#112846",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+
+          {role === "agent" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("chat") ? "lightgray" : "transparent",
+              }}
+              component={Link}
+              to="/chat"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ChatIcon sx={{ color: "#112846", fontSize: "28px" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Chat"
                   sx={{
                     opacity: open ? 1 : 0,
                     display: { xs: "none", md: "block" },

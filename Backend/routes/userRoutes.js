@@ -5,6 +5,7 @@ const {
   authorizePermissions,
 } = require("../middlewares/authentication");
 const {
+  getAdminFromUser,
   getAllUsers,
   getSingleUser,
   showCurrentUser,
@@ -28,5 +29,12 @@ router.route("/updateProfile/:id").patch(authenticateUser, updateProfile);
 router.route("/updateUserPassword").patch(authenticateUser, updateUserPassword);
 
 router.route("/getsingle/:id").get(authenticateUser, getSingleUser);
+router
+  .route("/getadmins")
+  .get(
+    authenticateUser,
+    authorizePermissions("agent", "admin"),
+    getAdminFromUser
+  );
 
 module.exports = router;

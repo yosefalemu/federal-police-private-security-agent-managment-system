@@ -1,6 +1,7 @@
 import {
   Box,
   IconButton,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -8,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import React, { useEffect, useState } from "react";
@@ -15,10 +17,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { removeFrom, setFrom } from "../../redux-toolkit/slices/agents";
+import SearchIcon from "@mui/icons-material/Search";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const AllUsers = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchByNationalId, setSearchByNationalId] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,9 +46,13 @@ const AllUsers = () => {
   }, []);
 
   console.log("users", users);
-  const sortedUsers = [...users].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-  );
+  const sortedUsers = [...users]
+    .filter((user) =>
+      (user?.firstName + user?.middleName + user?.lastName)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   useEffect(() => {
     dispatch(removeFrom());
@@ -52,6 +63,34 @@ const AllUsers = () => {
   }
   return (
     <Box>
+      <Box
+        sx={{
+          marginX: "auto",
+          marginBottom: "10px",
+          marginTop: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: { xs: "80%", md: "50%" },
+        }}
+      >
+        <TextField
+          type="text"
+          fullWidth
+          placeholder="Search by name with out space"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment>
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
       <TableContainer component={Paper} sx={{ bgcolor: "#f7f7f7" }}>
         <Table>
           <TableHead sx={{ background: "#bbb", color: "#fff" }}>
@@ -82,6 +121,10 @@ const AllUsers = () => {
               </TableCell>
               <TableCell sx={{ color: "#112846", width: "12%" }}>
                 Phone Number
+              </TableCell>
+              <TableCell sx={{ color: "#112846", width: "3%" }}>Edit</TableCell>
+              <TableCell sx={{ color: "#112846", width: "3%" }}>
+                Delete
               </TableCell>
               <TableCell sx={{ color: "#112846", width: "3%" }}>
                 Details
@@ -125,7 +168,29 @@ const AllUsers = () => {
                   >
                     {item.phoneNumber}
                   </TableCell>
-                  <TableCell sx={{ width: "12%" }}>
+                  <TableCell sx={{ width: "3%" }}>
+                    <IconButton
+                      sx={{ color: "orange" }}
+                      onClick={() => {
+                        navigate(`/allusers/editemployee/${item._id}`);
+                        dispatch(setFrom("allemployee"));
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell sx={{ width: "3%" }}>
+                    <IconButton
+                      sx={{ color: "red" }}
+                      onClick={() => {
+                        navigate(`/allusers/${item._id}`);
+                        dispatch(setFrom("allemployee"));
+                      }}
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell sx={{ width: "3%" }}>
                     <IconButton
                       sx={{ color: "blue" }}
                       onClick={() => {

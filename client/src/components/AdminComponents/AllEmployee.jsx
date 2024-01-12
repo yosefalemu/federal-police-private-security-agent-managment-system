@@ -1,6 +1,7 @@
 import {
   Box,
   IconButton,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -8,17 +9,20 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import SearchIcon from "@mui/icons-material/Search";
 import { removeFrom, setFrom } from "../../redux-toolkit/slices/agents";
 
 const AllEmployee = () => {
   const dispatch = useDispatch();
   const [employees, setEmployees] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,9 +43,14 @@ const AllEmployee = () => {
   }, []);
 
   console.log("employees", employees);
-  const sortedEmployees = [...employees].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-  );
+
+  const sortedEmployees = [...employees]
+    .filter((employee) =>
+      (employee?.firstName + employee?.middleName + employee?.lastName)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   useEffect(() => {
     dispatch(removeFrom());
@@ -52,6 +61,34 @@ const AllEmployee = () => {
   }
   return (
     <Box>
+      <Box
+        sx={{
+          marginX: "auto",
+          marginBottom: "10px",
+          marginTop: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: { xs: "80%", md: "50%" },
+        }}
+      >
+        <TextField
+          type="text"
+          fullWidth
+          placeholder="Search by name with out space"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment>
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
       <TableContainer component={Paper} sx={{ bgcolor: "#f7f7f7" }}>
         <Table>
           <TableHead sx={{ background: "#bbb", color: "#fff" }}>
@@ -129,7 +166,7 @@ const AllEmployee = () => {
                     <IconButton
                       sx={{ color: "blue" }}
                       onClick={() => {
-                        navigate(`/agentemployee/${item._id}`);
+                        navigate(`/allemployee/${item._id}`);
                         dispatch(setFrom("allemployee"));
                       }}
                     >

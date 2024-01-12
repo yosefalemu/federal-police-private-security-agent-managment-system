@@ -3,27 +3,73 @@ const { BadRequestError } = require("../errors");
 const socketIo = require("../socket");
 
 const createMessage = async (req, res) => {
-  const newMessage = new Message(req.body);
-
+  const { conversationId, sender, text } = req.body;
+  if (!conversationId || !sender || !text) {
+    throw new BadRequestError("All fields as required to create message");
+  }
   try {
-    const savedMessage = await newMessage.save();
-    const io = socketIo.getIo();
-    io.emit("newMessage", savedMessage); // Emitting a message to all connected clients
-    res.status(200).json(savedMessage);
-  } catch (err) {
-    res.status(500).json(err);
+    const message = await Message.create({
+      conversationId,
+      sender,
+      text,
+    });
+    res.status(201).json(message);
+  } catch (error) {
+    res.status(500).json(error);
   }
 };
 
 const getMessages = async (req, res) => {
+  const id = req.params.conversationId;
+  console.log(id);
   try {
-    const messages = await Message.find({
-      conversationId: req.params.conversationId,
-    });
-    res.status(200).json(messages);
-  } catch (err) {
-    res.status(500).json(err);
+    const messages = await Message.find({ conversationId: id });
+    res.status(201).json(messages);
+    console.log(messages);
+  } catch (error) {
+    res.status(500).json(error);
   }
 };
 
-module.exports = { createMessage, getMessages };
+const getUnViewedMessage = async (req, res) => {
+  const conversationId = req.params.id;
+  const { isViewed, currentUserId } = req.body;
+  try {
+    const unviewdMessages = await Message.find({
+      conversationId,
+      isViewed,
+    });
+    const unviewdMessage = unviewdMessages?.filter(
+      (item) => item.sender.toString() !== currentUserId.toString()
+    );
+    res.status(200).json(unviewdMessage);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateMessageView = async (req, res) => {
+  const id = req.params.id;
+  const { isViewed } = req.body;
+  try {
+    const updatedMessage = await Message.findByIdAndUpdate(
+      id,
+      {
+        isViewed,
+      },
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
+    console.log(`updatedMessage: ${updatedMessage}`);
+    res.status(201).json(updatedMessage);
+  } catch (error) {}
+};
+
+module.exports = {
+  createMessage,
+  getMessages,
+  getUnViewedMessage,
+  updateMessageView,
+};

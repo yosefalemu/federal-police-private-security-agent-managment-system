@@ -1,6 +1,7 @@
 import {
   Box,
   IconButton,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -8,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -21,11 +23,13 @@ import {
 } from "../../redux-toolkit/slices/fileSilce";
 import GroupsIcon from "@mui/icons-material/Groups";
 import { setCurrentAgentId } from "../../redux-toolkit/slices/agents";
+import SearchIcon from "@mui/icons-material/Search";
 
 const AgentsList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [agents, setAgents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getAllAgentsList = () => {
@@ -74,8 +78,45 @@ const AgentsList = () => {
       });
   };
 
+  const sortedAgents = [...agents]
+    .filter((agent) =>
+      agent?.agentName
+        .replace(/\s/g, "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
   return (
     <Box>
+      <Box
+        sx={{
+          marginX: "auto",
+          marginBottom: "10px",
+          marginTop: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: { xs: "80%", md: "50%" },
+        }}
+      >
+        <TextField
+          type="text"
+          fullWidth
+          placeholder="Search by name with out space"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment>
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
       <TableContainer component={Paper} sx={{ bgcolor: "#f7f7f7" }}>
         <Table>
           <TableHead sx={{ background: "#bbb", color: "#fff" }}>
@@ -139,7 +180,7 @@ const AgentsList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {agents?.map((item, index) => (
+            {sortedAgents?.map((item, index) => (
               <TableRow key={index}>
                 <TableCell
                   sx={{
@@ -212,7 +253,7 @@ const AgentsList = () => {
                     sx={{ color: "#EF9630" }}
                     onClick={() => {
                       dispatch(setCurrentAgentId(item._id));
-                      navigate(`/agentemployeepage/${item._id}`);
+                      navigate(`/agentslist/${item._id}`);
                     }}
                   >
                     <GroupsIcon sx={{ fontSize: 30 }} />

@@ -4,6 +4,7 @@ import userReducer from "./slices/userSlice";
 import fileReducer from "./slices/fileSilce";
 import agentReducer from "./slices/agents";
 import documentReducer from "./slices/document";
+import conversationReducer from "./slices/conversation";
 import {
   persistStore,
   persistReducer,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   file: fileReducer,
   agent: agentReducer,
   document: documentReducer,
+  conversation: conversationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

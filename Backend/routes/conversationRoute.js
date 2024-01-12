@@ -6,12 +6,10 @@ const {
 } = require("../middlewares/authentication");
 const {
   createConversation,
-  getUserConversation,
-  getConversationTwoUsers
+  getConversation,
 } = require("../controllers/conversationController");
 
 router.post("/createConversation", authenticateUser, createConversation);
-router.get("/:id", authenticateUser, getUserConversation);
-router.get("/:firstId/:secondId", authenticateUser, getConversationTwoUsers)
+router.get("/:id", authenticateUser, getConversation);
 
 module.exports = router;

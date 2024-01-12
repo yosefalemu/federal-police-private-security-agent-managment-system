@@ -28,9 +28,20 @@ const EmployeeSchema = new mongoose.Schema(
       ],
       unique: true,
     },
+    nationalId: {
+      type: String,
+      required: [true, "please provide the national Id"],
+      unique: true,
+    },
     phoneNumber: {
       type: String,
       required: [true, "please provide the phone number"],
+      match: [/^[0-9]{10}$/, "please provide a valid phone number"],
+    },
+    status: {
+      type: String,
+      enum: ["employeed", "free"],
+      default: "employeed",
     },
     employeeId: {
       type: String,
