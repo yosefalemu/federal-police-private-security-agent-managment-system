@@ -29,6 +29,8 @@ import {
 } from "../../redux-toolkit/slices/fileSilce";
 import toast from "react-hot-toast";
 import { setCurrentDocument } from "../../redux-toolkit/slices/document";
+import { useNavigate } from "react-router-dom";
+import { setAgentName } from "../../redux-toolkit/slices/agents";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -62,6 +64,7 @@ const CancelButton = styled(Button)({
 
 const AdminRequest = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { confirmId } = useSelector((state) => state.file);
   const [allRequests, setAllRequests] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
@@ -95,6 +98,7 @@ const AdminRequest = () => {
         toast.success("request done successfully");
         setTimeout(() => {
           setConfirmModal(false);
+          navigate("/certeficate");
         }, 4000);
       })
       .catch((error) => {
@@ -253,6 +257,7 @@ const AdminRequest = () => {
                     sx={{ color: "green" }}
                     onClick={() => {
                       dispatch(setConfirmId(item?._id));
+                      dispatch(setAgentName(item?.agentName));
                       setConfirmModal(true);
                     }}
                   >

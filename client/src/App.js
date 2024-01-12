@@ -19,6 +19,10 @@ import AddUserPage from "./pages/AdminPages/AddUserPage.jsx";
 import AllUsersPage from "./pages/AdminPages/AllUsersPage.jsx";
 import UserDetailPage from "./pages/AdminPages/UserDetailPage.jsx";
 import ApplicationDetail from "./pages/Screener/ApplicationDetail.jsx";
+import ChatPage from "./pages/ChatPage.jsx";
+import CerteficateGeneratorPage from "./pages/AdminPages/CerteficateGeneratorPage.jsx";
+import EditEmployeeList from "./pages/Agents/EditEmployeeList.jsx";
+import EditUserPage from "./pages/AdminPages/EditUserPage.jsx";
 
 function App() {
   return (
@@ -30,20 +34,31 @@ function App() {
         <Route path="/apply" element={<ApplyPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/agentslist" element={<AgentsListPage />} />
-        {/* <Route path="/allemployee" element={<EmployeePage />} /> */}
+        <Route path="/agentemployee/:id" element={<EmployeeDetailPage />} />
         <Route path="/agentemployee" element={<EmployeePage />} />
         <Route path="/addemployee" element={<AddEmployeePage />} />
         <Route path="/createuser" element={<CreateUserPage />} />
         <Route path="/agentsfile" element={<AgentFliesPage />} />
         <Route path="/adminfile" element={<AdminFliePage />} />
         <Route path="/agentdetail" element={<AgentsDetailPage />} />
-        <Route path="/agentemployee/:id" element={<EmployeeDetailPage />} />
-        <Route path="/agentemployeepage/:id" element={<AgentEmployeePage />} />
+        <Route path="/allemployee/:id" element={<EmployeeDetailPage />} />
+        <Route path="/agentslist/:id" element={<AgentEmployeePage />} />
+        <Route
+          path="/agentslist/employee/:id"
+          element={<EmployeeDetailPage />}
+        />
         <Route path="/allemployee" element={<AllEmployeePage />} />
         <Route path="/adduser" element={<AddUserPage />} />
         <Route path="/allusers" element={<AllUsersPage />} />
         <Route path="/allusers/:id" element={<UserDetailPage />} />
         <Route path="/applicationdetail" element={<ApplicationDetail />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/certeficate" element={<CerteficateGeneratorPage />} />
+        <Route
+          path="/agentemployee/editemployee/:id"
+          element={<EditEmployeeList />}
+        />
+        <Route path="/allusers/editemployee/:id" element={<EditUserPage />} />
       </Routes>
     </Router>
   );

@@ -7,6 +7,7 @@ const AgentSchema = new mongoose.Schema(
       required: [true, "please provide the name"],
       minlength: [3, "name must be minimum length of 3"],
       maxlength: [50, "name must be maximum length of 50"],
+      unique: true,
     },
 
     agentLogo: {

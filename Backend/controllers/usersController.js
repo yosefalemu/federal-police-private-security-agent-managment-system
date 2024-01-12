@@ -58,6 +58,13 @@ const loginUser = async (req, res) => {
     throw new UnauthenticatedError("wrong password");
   }
 };
+const getAdminFromUser = async (req, res) => {
+  const admins = await UserSchema.find({ role: "admin" });
+  if (!admins) {
+    throw new BadRequestError("No manager assigned yet!");
+  }
+  res.status(StatusCodes.OK).json(admins);
+};
 const logout = async (req, res) => {
   res.cookie("accessToken", "logout", {
     httpOnly: true,
@@ -82,7 +89,7 @@ const getSingleUser = async (req, res) => {
     if (!user) {
       throw new BadRequestError(`there is no user with id ${id}`);
     }
-    checkPermissions(req.user, user._id);
+    // checkPermissions(req.user, user._id);
     res.status(201).json(user);
   } catch (error) {
     console.log(error);
@@ -184,6 +191,7 @@ const uploadImage = async (req, res) => {
 module.exports = {
   createUser,
   loginUser,
+  getAdminFromUser,
   logout,
   getAllUsers,
   getSingleUser,

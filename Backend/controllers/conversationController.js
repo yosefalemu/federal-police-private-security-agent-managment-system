@@ -3,55 +3,38 @@ const { BadRequestError } = require("../errors");
 const socketIo = require("../socket");
 
 const createConversation = async (req, res) => {
-  const newConversation = new Conversation({
-    members: [req.body.senderId, req.body.receiverId],
-  });
+  console.log(req.body);
 
   try {
-    const savedConversation = await newConversation.save();
-    const io = socketIo.getIo();
-    io.emit("newConversation", savedConversation); // Emitting a message to all connected clients
-    res.status(200).json(savedConversation);
-  } catch (err) {
-    res.status(500).json(err);
-    throw new BadRequestError("Something went wrong or you added invalid data");
-  }
-};
-
-//get conv of a user
-
-const getUserConversation = async (req, res) => {
-  try {
-    const conversation = await Conversation.find({
-      members: { $in: [req.params.id] },
+    const chatExists = await Conversation.findOne({
+      members: { $all: [req.body.senderId, req.body.recieverId] },
     });
-    if (!conversation) {
-      throw new BadRequestError(
-        `No conversation for this specified user ${req.params.id}`
-      );
+    if (chatExists) {
+      return res.status(200).json(chatExists);
     }
-    res.status(200).json(conversation);
-  } catch (err) {
-    res.status(500).json(err);
+    const newChat = await Conversation.create({
+      members: [req.body.senderId, req.body.recieverId],
+      participants: req.body.participants,
+    });
+    res.status(201).json(newChat);
+  } catch (error) {
+    res.status(500).json(error);
   }
 };
 
-// get conv includes two userId
-
-const getConversationTwoUsers = async (req, res) => {
-  try {
-    const conversation = await Conversation.findOne({
-      members: { $all: [req.params.firstId, req.params.secondId] },
-    });
-    res.status(200).json(conversation);
-  } catch (err) {
-    res.status(500).json(err);
-    throw new BadRequestError("The two users doesn't have conversations")
+const getConversation = async (req, res) => {
+  const id = req.params.id;
+  console.log("get conversation", id);
+  const conversation = await Conversation.find({
+    members: { $in: [id] },
+  }).sort({ updatedAt: -1 });
+  if (!conversation) {
+    return;
   }
+  res.status(200).json(conversation);
 };
 
 module.exports = {
   createConversation,
-  getConversationTwoUsers,
-  getUserConversation,
+  getConversation,
 };

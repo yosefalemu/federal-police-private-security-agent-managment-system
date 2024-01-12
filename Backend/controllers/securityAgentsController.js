@@ -27,6 +27,21 @@ const getSingleAgent = async (req, res) => {
   }
 };
 
+const getSingleAgentByName = async (req, res) => {
+  const { agentName } = req.body;
+  console.log("agentName", agentName);
+  try {
+    const agent = await AgentSchema.findOne({ agentName: agentName });
+    console.log(agent);
+    if (!agent) {
+      throw new BadRequestError(`there is no Agent with name ${agentName}`);
+    }
+    res.status(201).json(agent);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const getAgentWithEmail = async (req, res) => {
   const email = req.params.email;
   const agent = await AgentSchema.findOne({ email: email });
@@ -54,6 +69,7 @@ const updateAgent = async (req, res) => {
 module.exports = {
   getAllAgents,
   getSingleAgent,
+  getSingleAgentByName,
   getAgentWithEmail,
   updateAgent,
 };

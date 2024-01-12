@@ -16,7 +16,10 @@ const EmployeeDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [employees, setEmployees] = useState({});
+  const [agent, setAgent] = useState({});
   const { currentAgentId } = useSelector((state) => state.agent);
+  const { role } = useSelector((state) => state.user.user);
+  const { from } = useSelector((state) => state.agent);
   console.log(id);
   useEffect(() => {
     const getSingleAgentEmployee = () => {
@@ -34,8 +37,28 @@ const EmployeeDetail = () => {
     };
     getSingleAgentEmployee();
   }, []);
-  const { role } = useSelector((state) => state.user.user);
-  const { from } = useSelector((state) => state.agent);
+
+  useEffect(() => {
+    if (employees?.agentId) {
+      const getSingleAgent = () => {
+        axios
+          .get(`http://localhost:5000/api/v1/agents/${employees?.agentId}`, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            setAgent(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      };
+
+      getSingleAgent();
+    }
+  }, [employees.agentId]);
+  console.log("employee", employees);
+  console.log("agent employee detail", agent);
+
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   return (
     <Box sx={{ padding: "50px 0px 0px 10px", position: "relative" }}>
@@ -64,7 +87,7 @@ const EmployeeDetail = () => {
       {role === "admin" && (
         <Box
           component={Link}
-          to={`/agentemployeepage/${currentAgentId}`}
+          to={`/agentslist/${currentAgentId}`}
           sx={{
             position: "absolute",
             top: "40px",
@@ -161,7 +184,7 @@ const EmployeeDetail = () => {
             >
               Employee Id
             </Typography>
-            <Box sx={{ width: "300px", height: "300px" }}>
+            <Box sx={{ width: "300px", height: "150px" }}>
               <img
                 src={`${PF}uploads/${employees.employeeId}`}
                 alt="test"
@@ -169,9 +192,8 @@ const EmployeeDetail = () => {
                 style={{
                   width: "100%",
                   height: "100%",
-                  borderRadius: "50%",
-                  objectFit: "contain",
-                  border: "1px solid #112846",
+                  objectFit: "fill",
+                  border: "3px solid #112846",
                 }}
               />
             </Box>
@@ -187,7 +209,7 @@ const EmployeeDetail = () => {
             <Typography variant="h5" color={"#112846"}>
               Cosigner Id
             </Typography>
-            <Box sx={{ width: "300px", height: "300px" }}>
+            <Box sx={{ width: "300px", height: "150px" }}>
               <img
                 src={`${PF}uploads/${employees.cosignerId}`}
                 alt="test"
@@ -195,9 +217,8 @@ const EmployeeDetail = () => {
                 style={{
                   width: "100%",
                   height: "100%",
-                  borderRadius: "50%",
-                  objectFit: "contain",
-                  border: "1px solid #112846",
+                  objectFit: "fill",
+                  border: "3px solid #112846",
                 }}
               />
             </Box>
@@ -296,6 +317,62 @@ const EmployeeDetail = () => {
                 {employees.phoneNumber}
               </Typography>
             </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
+                Status:
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {employees.status}
+              </Typography>
+            </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
+                Agent Name:
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {agent.agentName}
+              </Typography>
+            </ListItemForModal>
+            {role === "admin" && (
+              <ListItemForModal>
+                <Typography
+                  variant="h6"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={500}
+                >
+                  National Id:
+                </Typography>
+                <Typography
+                  variant="body1"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={400}
+                >
+                  {employees?.nationalId}
+                </Typography>
+              </ListItemForModal>
+            )}
           </List>
         </Box>
       </Box>

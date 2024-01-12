@@ -7,11 +7,13 @@ const {
 const {
   createMessage,
   getMessages,
-
+  getUnViewedMessage,
+  updateMessageView,
 } = require("../controllers/messageController");
 
 router.post("/createMessage", authenticateUser, createMessage);
 router.get("/:conversationId", authenticateUser, getMessages);
-
+router.post("/getunviewed/:id", authenticateUser, getUnViewedMessage);
+router.patch("/updateView/:id", authenticateUser, updateMessageView);
 
 module.exports = router;
