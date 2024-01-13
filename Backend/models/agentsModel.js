@@ -28,6 +28,10 @@ const AgentSchema = new mongoose.Schema(
         type: String,
         required: [true, "please provide kebele"],
       },
+      houseNumber: {
+        type: String,
+        required: [true, "please provide house number"],
+      },
     },
     firstName: {
       type: String,

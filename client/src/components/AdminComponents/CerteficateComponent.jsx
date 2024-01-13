@@ -68,7 +68,7 @@ const CerteficateComponent = () => {
         console.log(response.data);
         setCerteficate({
           agentName: response?.data?.agentName,
-          address: `${response?.data?.address?.city} sub city ${response?.data?.address?.woreda} house number`,
+          address: `${response?.data?.address?.city} yeka ${response?.data?.address?.woreda} ${response.data.address.houseNumber}`,
           profilePicture: response?.data?.profilePicture,
           level: "",
           dateOfIssuedInEthiopianCalander: "",
@@ -105,6 +105,17 @@ const CerteficateComponent = () => {
       certeficate.profilePicture
     ) {
       console.log("certeficate to be printed", certeficate);
+      setCerteficate({
+        agentName: "",
+        address: "",
+        profilePicture: "",
+        level: "",
+        dateOfIssuedInEthiopianCalander: "",
+        dateOfIssuedInEuropeanCalander: "",
+        dateOfExpiredInEthiopianCalander: "",
+        dateOfExpiredInEuropeanCalander: "",
+        approvedBy: "",
+      });
       setCerteficateModal(true);
     } else {
       toast.error("Please fill all required fields");

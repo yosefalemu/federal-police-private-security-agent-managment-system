@@ -1,6 +1,6 @@
 const UserSchema = require("../models/usersModel");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
-// const sendEmail = require("../utils/sendEmail");
+const sendNotificationEmail = require("../mailServices/sendNotificationEmail");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const path = require("path");
@@ -9,6 +9,8 @@ const {
   attachCookiesToResponse,
   checkPermissions,
 } = require("../utils");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const createUser = async (req, res) => {
   const { email } = req.body;
@@ -43,7 +45,7 @@ const loginUser = async (req, res) => {
   if (!password) {
     throw new BadRequestError("password required");
   }
-  const user = await UserSchema.findOne({ email });
+  const user = await UserSchema.findOne({ email, persmission: "allowed" });
   console.log(user);
   if (!user) {
     throw new UnauthenticatedError("Invalid creditials");
@@ -65,6 +67,62 @@ const getAdminFromUser = async (req, res) => {
   }
   res.status(StatusCodes.OK).json(admins);
 };
+
+const updateUserByAdmin = async (req, res) => {
+  const userId = req.params.userId;
+  console.log("req.body", req.body.dataToBeUpdated);
+  const { newPasswordToUpdated } = req.body.dataToBeUpdated;
+  const { persmission, email } = req.body.dataToBeUpdated;
+  let hashedPassword = "";
+
+  let updateObject = {};
+
+  if (newPasswordToUpdated) {
+    const salt = await bcrypt.genSalt(10);
+    hashedPassword = await bcrypt.hash(newPasswordToUpdated, salt);
+    updateObject = {
+      ...req.body.dataToBeUpdated,
+      password: hashedPassword,
+    };
+  } else {
+    updateObject = {
+      ...req.body.dataToBeUpdated,
+    };
+  }
+  console.log("updated Object", updateObject);
+  const updatedUser = await UserSchema.findOneAndUpdate(
+    { _id: userId },
+    updateObject,
+    {
+      runValidators: true,
+      new: true,
+    }
+  );
+
+  if (!updatedUser) {
+    return res
+      .status(404)
+      .json({ error: `There is no user with id ${userId}` });
+  }
+
+  if (persmission) {
+    if (persmission === "allowed") {
+      sendNotificationEmail({
+        email: email,
+        subject: "Access Permission Granted",
+        text: `Congratulations! You have successfully regained access permission. We are delighted to inform you that your access has been reinstated. Your commitment to compliance and security is highly appreciated. Should you have any further questions or concerns, please do not hesitate to reach out. Thank you for your cooperation.`,
+      });
+    } else {
+      sendNotificationEmail({
+        email: email,
+        subject: "Access Restriction Notification",
+        text: `We regret to inform you that your access permission has been restricted. Please be aware that certain functionalities may no longer be available. If you believe this is an error or have any concerns, kindly contact our support team for assistance. We appreciate your understanding.`,
+      });
+    }
+  }
+  res.status(200).json(updatedUser);
+};
+
 const logout = async (req, res) => {
   res.cookie("accessToken", "logout", {
     httpOnly: true,
@@ -192,6 +250,7 @@ module.exports = {
   createUser,
   loginUser,
   getAdminFromUser,
+  updateUserByAdmin,
   logout,
   getAllUsers,
   getSingleUser,

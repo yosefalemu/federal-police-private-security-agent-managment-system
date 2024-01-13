@@ -33,6 +33,9 @@ const AgentsFileComponents = () => {
 
   const { agentsFile } = useSelector((state) => state.file);
   const { role } = useSelector((state) => state.user.user);
+  const { from } = useSelector((state) => state.agent);
+
+  console.log("from agent file", from);
 
   const handlePreviousPage = () => {
     setPageNumber((prevPageNumber) => Math.max(1, prevPageNumber - 1));
@@ -44,10 +47,33 @@ const AgentsFileComponents = () => {
 
   return (
     <Box sx={{ padding: "10px", background: "#dedede", position: "relative" }}>
-      {role === "admin" && (
+      {role === "admin" && from === "agentslist" && (
         <Box
           component={Link}
           to="/agentslist"
+          sx={{
+            position: "absolute",
+            top: "20px",
+            left: "20px",
+            background: "#112846",
+            color: "#fff",
+            textDecoration: "none",
+            padding: "10px 20px 10px 10px",
+            borderRadius: "5px",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <KeyboardBackspaceIcon />
+          Back
+        </Box>
+      )}
+
+      {role === "admin" && from === "adminRequest" && (
+        <Box
+          component={Link}
+          to="/adminRequest"
           sx={{
             position: "absolute",
             top: "20px",

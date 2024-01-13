@@ -22,7 +22,11 @@ import {
   setAgentFile,
 } from "../../redux-toolkit/slices/fileSilce";
 import GroupsIcon from "@mui/icons-material/Groups";
-import { setCurrentAgentId } from "../../redux-toolkit/slices/agents";
+import {
+  removeFrom,
+  setCurrentAgentId,
+  setFrom,
+} from "../../redux-toolkit/slices/agents";
 import SearchIcon from "@mui/icons-material/Search";
 
 const AgentsList = () => {
@@ -31,6 +35,9 @@ const AgentsList = () => {
   const [agents, setAgents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    dispatch(removeFrom());
+  }, []);
   useEffect(() => {
     const getAllAgentsList = () => {
       axios
@@ -56,7 +63,8 @@ const AgentsList = () => {
       })
       .then((response) => {
         dispatch(setAgentFile(response?.data?.agentFile));
-        navigate("/agentsfile");
+        dispatch(setFrom("agentslist"));
+        navigate("/agentslist/agentfile");
       })
       .catch((error) => {
         console.log(error);
@@ -71,7 +79,8 @@ const AgentsList = () => {
       })
       .then((response) => {
         dispatch(setAdminFile(response?.data?.ownerFile));
-        navigate("/adminfile");
+        dispatch(setFrom("agentslist"));
+        navigate("/agentslist/adminfile");
       })
       .catch((error) => {
         console.log(error);
@@ -222,7 +231,7 @@ const AgentsList = () => {
                     sx={{ color: "#EF9630" }}
                     onClick={() => {
                       dispatch(setCurrentAgentId(item._id));
-                      navigate("/agentdetail");
+                      navigate("/agentslist/agentdetail");
                     }}
                   >
                     <SettingsAccessibilityIcon />

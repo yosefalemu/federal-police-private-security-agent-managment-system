@@ -123,20 +123,23 @@ const AllScreenerRequestList = () => {
 
   const handleDeclinedRequest = () => {
     axios
-      .patch(
+      .delete(
         `http://localhost:5000/api/v1/documents/rejectDocument/${confirmId}`,
-        { text: rejectionReason },
-        { withCredentials: true }
+        {
+          data: { text: rejectionReason },
+          withCredentials: true,
+        }
       )
       .then((response) => {
         console.log(response);
-        toast.success("request done successfully");
+        toast.success("Request declined successfully");
         setTimeout(() => {
           setConfirmModal(false);
+          setDeclineModal(false);
         }, 4000);
       })
       .catch((error) => {
-        toast.error("error while requesting");
+        toast.error("Error while declining request");
         setTimeout(() => {
           setConfirmModal(false);
         }, 4000);
@@ -254,7 +257,7 @@ const AllScreenerRequestList = () => {
                   <IconButton
                     sx={{ color: "#EF9630" }}
                     component={Link}
-                    to="/applicationdetail"
+                    to="/screenerrequest/applicationdetail"
                     onClick={() => {
                       dispatch(setCurrentDocument(item._id));
                     }}
@@ -266,7 +269,7 @@ const AllScreenerRequestList = () => {
                   <IconButton
                     sx={{ color: "#EF9630" }}
                     component={Link}
-                    to="/agentsfile"
+                    to="/screenerrequest/agentfile"
                     onClick={() => {
                       dispatch(setAgentFile(item?.agentFile));
                     }}
@@ -277,7 +280,7 @@ const AllScreenerRequestList = () => {
                 <TableCell sx={{ width: "12%", textAlign: "center" }}>
                   <IconButton
                     component={Link}
-                    to="/adminfile"
+                    to="/screenerrequest/adminfile"
                     sx={{ color: "#EF9630" }}
                     onClick={() => {
                       dispatch(setAdminFile(item?.ownerFile));

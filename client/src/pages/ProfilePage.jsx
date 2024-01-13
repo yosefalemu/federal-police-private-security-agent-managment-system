@@ -37,6 +37,8 @@ const ProfilePage = () => {
   const [profileInfo, setProfileInfo] = useState({});
   const [loading, setLoading] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
+  const { _id, role } = useSelector((state) => state.user.user);
+
   const userInformation = [
     { label: "First Name", value: user?.firstName },
     { label: "Middle Name", value: user?.middleName },
@@ -46,21 +48,15 @@ const ProfilePage = () => {
     { label: "Role", value: user?.role },
   ];
 
-  const { _id } = useSelector((state) => state.user.user);
-  console.log("user", user);
-  console.log("profileInfo", profileInfo);
   const handleImageUpload = (e) => {
     e.preventDefault();
     const file = e.target.files[0];
     if (!file) {
       return;
     }
-
     const formData = new FormData();
     formData.append("image", file);
-
     setLoading(true);
-
     axios
       .post("http://localhost:5000/api/v1/users/uploadImage", formData)
       .then((response) => {
@@ -84,20 +80,22 @@ const ProfilePage = () => {
       [name]: value,
     });
   };
+
   useEffect(() => {
     axios
       .get(`http://localhost:5000/api/v1/users/getsingle/${_id}`, {
         withCredentials: true,
       })
       .then((response) => {
+        console.log("log in profile", response.data);
         setUser(response.data);
         setProfileInfo({
           firstName: response.data.firstName || "",
           middleName: response.data.middleName || "",
           lastName: response.data.lastName || "",
           phoneNumber: response.data.phoneNumber || "",
+          profilePicture: response.data.profilePicture || "",
         });
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -106,13 +104,13 @@ const ProfilePage = () => {
 
   const handleUpdateProfile = () => {
     const updateData = {
-      firstName: user.firstName,
-      middleName: user.middleName,
-      lastName: user.lastName,
-      phoneNumber: user.phoneNumber,
-      profilePicture: profilePicture,
+      firstName: profileInfo.firstName,
+      middleName: profileInfo.middleName,
+      lastName: profileInfo.lastName,
+      phoneNumber: profileInfo.phoneNumber,
+      profilePicture: profilePicture || profileInfo.profilePicture,
     };
-    console.log("updated data", updateData);
+    console.log("data to be updated", updateData);
     axios
       .patch(
         `http://localhost:5000/api/v1/users/updateProfile/${_id}`,
@@ -120,18 +118,45 @@ const ProfilePage = () => {
         { withCredentials: true }
       )
       .then((response) => {
+        console.log("updated data", response.data);
         setUser(response.data.user);
-        console.log(response.data);
-        toast.success("Profile updated successfully");
+        setProfileInfo(response.data.user);
+        console.log("log user id", user._id);
+        const dataToBeUpdated = {
+          firstName: profileInfo?.firstName,
+          middleName: profileInfo?.middleName,
+          lastName: profileInfo?.lastName,
+          phoneNumber: profileInfo?.phoneNumber,
+          profilePicture: profileInfo?.profilePicture,
+        };
+
+        if (role === "agent") {
+          axios
+            .patch(
+              `http://localhost:5000/api/v1/agents/updateAgentFromUser/${user?._id}`,
+              { dataToBeUpdated },
+              { withCredentials: true }
+            )
+            .then((response) => {
+              toast.success("Your profile and agent updated successfully");
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        if (role !== "agent") {
+          toast.success("Profile updated successfully");
+        }
       })
       .catch((error) => {
-        console.log(error);
-        toast.error("Error while updating profile");
+        console.log(error.response.data);
+        toast.error(error.response.data.msg);
       });
   };
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
-  console.log("images", `${PF}uploads/${user?.profilePicture}`);
+  console.log("profile info", profileInfo);
 
   return (
     <>
@@ -170,19 +195,21 @@ const ProfilePage = () => {
                       height: "100%",
                     }}
                   >
-                    {user?.profilePicture && (
-                      <Avatar
-                        alt="User Image"
-                        src={`${PF}uploads/${user?.profilePicture}`}
-                        crossOrigin="anonymous"
-                        sx={{
-                          width: { xs: 100, md: 120, xl: 150 },
-                          height: { xs: 100, md: 120, xl: 150 },
-                          alignSelf: "center",
-                          marginBottom: 4,
-                        }}
-                      />
-                    )}
+                    <Avatar
+                      alt="User Image"
+                      src={
+                        user?.profilePicture
+                          ? `${PF}uploads/${user?.profilePicture}`
+                          : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGst2EJfEU4M83w0oCJ0mpZ1O_n8jpiuvjOO4IvOFgRA&s"
+                      }
+                      crossOrigin="anonymous"
+                      sx={{
+                        width: { xs: 100, md: 120, xl: 150 },
+                        height: { xs: 100, md: 120, xl: 150 },
+                        alignSelf: "center",
+                        marginBottom: 4,
+                      }}
+                    />
 
                     <TableContainer sx={{ width: "100%" }}>
                       <Table>

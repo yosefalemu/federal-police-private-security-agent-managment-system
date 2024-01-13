@@ -239,6 +239,42 @@ const ApplicationComponent = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={500}
               >
+                Date Of Birth:
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {document?.dateOfBirth}
+              </Typography>
+            </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
+                Owner National Id:
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {document?.nationalId}
+              </Typography>
+            </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
                 Email:
               </Typography>
               <Typography
@@ -320,6 +356,24 @@ const ApplicationComponent = () => {
                 fontWeight={400}
               >
                 {document?.address?.kebele}
+              </Typography>
+            </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
+                House Number
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {document?.address?.houseNumber}
               </Typography>
             </ListItemForModal>
           </List>

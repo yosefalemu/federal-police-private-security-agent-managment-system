@@ -75,7 +75,7 @@ export default function LoginHeader() {
             }}
             variant="contained"
             component={Link}
-            to="/apply"
+            to="/applyassistance"
           >
             Apply
           </Button>

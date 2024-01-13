@@ -10,6 +10,7 @@ const {
   getSingleDocument,
   acceptDocument,
   rejectDocument,
+  rejectDocumentByAdmin,
   uploadFile,
   checkDocument,
   findUncheckedDocuments,
@@ -42,11 +43,18 @@ router
   .route("/acceptDocument/:id")
   .patch(authenticateUser, authorizePermissions("admin"), acceptDocument);
 router
-  .route("/rejectDocument/:id")
+  .route("/rejectDocument/:documentId")
   .delete(
     authenticateUser,
     authorizePermissions("admin", "screener"),
     rejectDocument
+  );
+router
+  .route("/rejectDocumentByAdmin/:documentId")
+  .patch(
+    authenticateUser,
+    authorizePermissions("admin", "screener"),
+    rejectDocumentByAdmin
   );
 router.route("/:id").get(authenticateUser, getSingleDocument);
 

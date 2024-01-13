@@ -41,7 +41,14 @@ const UserSchema = new mongoose.Schema(
       minlength: [6, "password must be minimum length of 6"],
       required: [true, "please provide the password"],
     },
-
+    nationalId: {
+      type: String,
+      required: [true, "please provide national id"],
+    },
+    dateOfBirth: {
+      type: String,
+      required: [true, "please provide date of birth"],
+    },
     profilePicture: {
       type: String,
       required: [true, "please provide the profile picture"],
@@ -49,6 +56,11 @@ const UserSchema = new mongoose.Schema(
     role: {
       type: String,
       required: [true, "please provide the role"],
+    },
+    persmission: {
+      type: String,
+      enum: ["allowed", "blocked"],
+      default: "allowed",
     },
   },
   { timestamps: true }
