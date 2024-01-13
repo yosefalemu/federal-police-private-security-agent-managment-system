@@ -10,6 +10,8 @@ import {
   styled,
   FormLabel,
   InputLabel,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import toast from "react-hot-toast";
@@ -17,7 +19,7 @@ import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
 import ApplyHeader from "../components/ApplyHeader";
 import { Link } from "react-router-dom";
-
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 const FileContainer = styled(Box)({
@@ -28,18 +30,20 @@ const FileContainer = styled(Box)({
 });
 
 const InputContainer = styled(Box)({
-  width: "50%",
+  width: "80%",
   display: "flex",
   alignItems: "center",
   gap: "30px",
   padding: "14px 10px",
   marginBottom: "15px",
 });
-
-const InputLabelContainer = styled(InputLabel)({
-  border: "2px dashed gray",
-  padding: "5px",
-  cursor: "pointer",
+const InputContainerUploadFile = styled(Box)({
+  width: "80%",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  padding: "14px 10px",
+  marginBottom: "15px",
 });
 const WholeInputContainer = styled(Box)({
   height: "80%",
@@ -70,10 +74,13 @@ const ApplyButton = styled(Button)({
 
 const ApplyPage = () => {
   const [profilePicture, setProfilePicture] = useState("");
+  const [agentProfilePictureImage, setAgentProfilePictureImage] = useState("");
   const [agentLogo, setAgentLogo] = useState("");
+  const [agentLogoImage, setAgentLogoImage] = useState("");
+  const [agentUniform, setAgentUniform] = useState("");
+  const [agentUniformImage, setAgentUniformImage] = useState("");
   const [agentFile, setAgentFile] = useState("");
   const [ownerFile, setOwnerFile] = useState("");
-  const [agentUniform, setAgentUniform] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [apply, setApply] = useState({
@@ -81,11 +88,14 @@ const ApplyPage = () => {
     firstName: "",
     middleName: "",
     lastName: "",
+    dateOfBirth: "",
     email: "",
+    nationalId: "",
     phoneNumber: "",
     city: "",
     woreda: "",
     kebele: "",
+    houseNumber: "",
   });
 
   const handleFormChange = (event) => {
@@ -110,80 +120,8 @@ const ApplyPage = () => {
       .then((response) => {
         console.log(response);
         setAgentLogo(response.data.image);
+        setAgentLogoImage(URL.createObjectURL(file));
         toast.success("Agent's Logo uploaded successfully");
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        toast.error(error.response.data.msg);
-        console.log(error);
-      });
-  };
-  const uploadAgentsFile = async (e) => {
-    e.preventDefault();
-    console.log("tested");
-
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    setLoading(true);
-    axios
-      .post("http://localhost:5000/api/v1/documents/uploadFile", formData)
-      .then((response) => {
-        console.log(response);
-        setAgentFile(response.data.image);
-        toast.success("Agent file upload successfully");
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        toast.error(error.response.data.msg);
-        console.log(error);
-      });
-  };
-
-  const uploadOwnerFile = async (e) => {
-    e.preventDefault();
-    console.log("third");
-
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    setLoading(true);
-    axios
-      .post("http://localhost:5000/api/v1/documents/uploadFile", formData)
-      .then((response) => {
-        console.log(response);
-        setOwnerFile(response.data.image);
-        toast.success("Owner file upload successfully");
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        toast.error(error.response.data.msg);
-        console.log(error);
-      });
-  };
-
-  const uploadAgentsAdminProfilePicture = async (e) => {
-    e.preventDefault();
-    console.log("first");
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("image", file);
-    setLoading(true);
-    axios
-      .post("http://localhost:5000/api/v1/users/uploadImage", formData)
-      .then((response) => {
-        console.log(response);
-        setProfilePicture(response.data.image);
-        toast.success("Agent's Admin profile picture uploaded successfully");
         setLoading(false);
       })
       .catch((error) => {
@@ -206,6 +144,7 @@ const ApplyPage = () => {
       .then((response) => {
         console.log(response);
         setAgentUniform(response.data.image);
+        setAgentUniformImage(URL.createObjectURL(file));
         toast.success("Agent's uniform uploaded successfully");
         setLoading(false);
       })
@@ -215,11 +154,86 @@ const ApplyPage = () => {
         console.log(error);
       });
   };
+  const uploadAgentsAdminProfilePicture = async (e) => {
+    e.preventDefault();
+    console.log("first");
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/users/uploadImage", formData)
+      .then((response) => {
+        console.log(response);
+        setProfilePicture(response.data.image);
+        setAgentProfilePictureImage(URL.createObjectURL(file));
+        toast.success("Agent's Admin profile picture uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+  const uploadAgentsFile = async (e) => {
+    e.preventDefault();
+
+    const fileInput = e.target;
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/documents/uploadFile", formData)
+      .then((response) => {
+        console.log(response);
+        setAgentFile(response.data.image);
+        toast.success("Agent file uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+
+  const uploadOwnerFile = async (e) => {
+    e.preventDefault();
+
+    const fileInput = e.target;
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    setLoading(true);
+    axios
+      .post("http://localhost:5000/api/v1/documents/uploadFile", formData)
+      .then((response) => {
+        console.log(response);
+        setOwnerFile(response.data.image);
+        toast.success("Owner file uploaded successfully");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.response.data.msg);
+        console.log(error);
+      });
+  };
+
   const createDocument = () => {
     const address = {
       city: apply.city,
       kebele: apply.kebele,
       woreda: apply.woreda,
+      houseNumber: apply.houseNumber,
     };
     console.log("agentLogo", agentLogo);
     console.log("agentFile", agentFile);
@@ -242,7 +256,9 @@ const ApplyPage = () => {
       firstName: apply.firstName,
       middleName: apply.middleName,
       lastName: apply.lastName,
+      dateOfBirth: apply.dateOfBirth,
       email: apply.email,
+      nationalId: apply.nationalId,
       phoneNumber: apply.phoneNumber,
       address: address,
       agentLogo: agentLogo,
@@ -258,8 +274,26 @@ const ApplyPage = () => {
       .post("http://localhost:5000/api/v1/documents/apply", documentData)
       .then((response) => {
         console.log(response);
-        // setProfilePicture(response.data.image);
         toast.success("Document send wait response on your email");
+        setApply({
+          agentName: "",
+          firstName: "",
+          middleName: "",
+          lastName: "",
+          dateOfBirth: "",
+          email: "",
+          nationalId: "",
+          phoneNumber: "",
+          city: "",
+          woreda: "",
+          kebele: "",
+          houseNumber: "",
+        });
+        setAgentLogoImage(null);
+        setAgentProfilePictureImage(null);
+        setAgentUniformImage(null);
+        setAgentFile(null);
+        setOwnerFile(null);
         setLoading(false);
       })
       .catch((error) => {
@@ -285,7 +319,7 @@ const ApplyPage = () => {
       >
         <Box
           component={Link}
-          to="/"
+          to="/applyassistance"
           sx={{
             position: "absolute",
             top: "80px",
@@ -312,6 +346,7 @@ const ApplyPage = () => {
           Apply Here to be Certified
         </Typography>
         <Paper
+          elevation={4}
           sx={{
             width: "55%",
             height: "70%",
@@ -343,6 +378,7 @@ const ApplyPage = () => {
               id="agentName"
               label="Agent Name"
               name="agentName"
+              value={apply?.agentName}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -354,6 +390,7 @@ const ApplyPage = () => {
               id="firstName"
               label="First Name"
               name="firstName"
+              value={apply?.firstName}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -365,6 +402,7 @@ const ApplyPage = () => {
               id="middleName"
               label="Middle Name"
               name="middleName"
+              value={apply?.middleName}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -376,6 +414,39 @@ const ApplyPage = () => {
               id="lastName"
               label="Last Name"
               name="lastName"
+              value={apply?.lastName}
+              autoFocus
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              onChange={handleFormChange}
+            />
+            <InputLabel
+              htmlFor="dateOfBirth"
+              sx={{ marginTop: "10px", marginBottom: "-5px" }}
+            >
+              <Typography textAlign={"left"} margin={0}>
+                Date Of Birth
+              </Typography>
+            </InputLabel>
+            <TextField
+              fullWidth
+              id="dateOfBirth"
+              name="dateOfBirth"
+              value={apply?.dateOfBirth}
+              autoFocus
+              variant="outlined"
+              type="date"
+              margin="normal"
+              required
+              onChange={handleFormChange}
+            />
+            <TextField
+              id="email"
+              label="Email"
+              name="email"
+              value={apply?.email}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -384,9 +455,10 @@ const ApplyPage = () => {
               onChange={handleFormChange}
             />
             <TextField
-              id="email"
-              label="Email"
-              name="email"
+              id="nationalId"
+              label="National Id"
+              name="nationalId"
+              value={apply?.nationalId}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -398,6 +470,7 @@ const ApplyPage = () => {
               id="phoneNumber"
               label="Phone Number"
               name="phoneNumber"
+              value={apply?.phoneNumber}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -409,6 +482,7 @@ const ApplyPage = () => {
               id="city"
               label="City"
               name="city"
+              value={apply?.city}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -420,6 +494,7 @@ const ApplyPage = () => {
               id="woreda"
               label="Woreda"
               name="woreda"
+              value={apply?.woreda}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -431,6 +506,19 @@ const ApplyPage = () => {
               id="kebele"
               label="Kebele"
               name="kebele"
+              value={apply?.kebele}
+              autoFocus
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              onChange={handleFormChange}
+            />
+            <TextField
+              id="houseNumber"
+              label="House Number"
+              name="houseNumber"
+              value={apply?.houseNumber}
               autoFocus
               variant="outlined"
               margin="normal"
@@ -442,66 +530,271 @@ const ApplyPage = () => {
             <FileContainer>
               <InputContainer>
                 <Typography color={"#112846"}>Upload Agent Logo</Typography>
-                <InputLabelContainer htmlFor="agentLogoInput">
-                  <UploadFileIcon style={{ marginRight: "5px" }} />
-                  <Input
-                    type="file"
-                    id="agentLogoInput"
-                    onChange={uploadAgentsLogo}
-                    style={{ display: "none" }}
-                  />
-                </InputLabelContainer>
+                <div
+                  style={{
+                    padding: "2rem",
+                    background: "#f0f0f0",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    border: "2px dashed #97dce6",
+                    height: "130px",
+                    width: "130px",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    margin: "1.5rem auto",
+                  }}
+                  onMouseEnter={(event) => {
+                    event.target.style.border = "2px solid #97dce6";
+                  }}
+                  onMouseLeave={(event) => {
+                    event.target.style.border = "2px dashed #97dce6";
+                  }}
+                >
+                  <label
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => uploadAgentsLogo(e)}
+                    />
+                    {agentLogoImage ? (
+                      <img
+                        src={agentLogoImage}
+                        width={150}
+                        height={150}
+                        alt="fileName"
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CloudUploadIcon
+                          style={{
+                            color: "#12596B",
+                            fontSize: 50,
+                            cursor: "pointer",
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 10,
+                            marginTop: 5,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Upload Image
+                        </span>
+                      </div>
+                    )}
+                  </label>
+                </div>
               </InputContainer>
               <InputContainer>
-                <Typography color={"#112846"}>Upload Agent's File</Typography>
-                <InputLabelContainer htmlFor="AgentsFileInput">
-                  <UploadFileIcon style={{ marginRight: "5px" }} />
-                  <Input
-                    type="file"
-                    id="AgentsFileInput"
-                    onChange={uploadAgentsFile}
-                    style={{ display: "none" }}
-                  />
-                </InputLabelContainer>
-              </InputContainer>
-              <InputContainer>
-                <Typography color={"#112846"}>Upload Owner's File</Typography>
-                <InputLabelContainer htmlFor="AgentsOwnerInput">
-                  <UploadFileIcon style={{ marginRight: "5px" }} />
-                  <Input
-                    type="file"
-                    id="AgentsOwnerInput"
-                    onChange={uploadOwnerFile}
-                    style={{ display: "none" }}
-                  />
-                </InputLabelContainer>
+                <Typography color={"#112846"}>Upload Agent Uniform</Typography>
+                <div
+                  style={{
+                    padding: "2rem",
+                    background: "#f0f0f0",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    border: "2px dashed #97dce6",
+                    height: "130px",
+                    width: "130px",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    margin: "1.5rem auto",
+                  }}
+                  onMouseEnter={(event) => {
+                    event.target.style.border = "2px solid #97dce6";
+                  }}
+                  onMouseLeave={(event) => {
+                    event.target.style.border = "2px dashed #97dce6";
+                  }}
+                >
+                  <label
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => uploadAgentsUniform(e)}
+                    />
+                    {agentUniformImage ? (
+                      <img
+                        src={agentUniformImage}
+                        width={150}
+                        height={150}
+                        alt="fileName"
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CloudUploadIcon
+                          style={{
+                            color: "#12596B",
+                            fontSize: 50,
+                            cursor: "pointer",
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 10,
+                            marginTop: 5,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Upload Image
+                        </span>
+                      </div>
+                    )}
+                  </label>
+                </div>
               </InputContainer>
               <InputContainer>
                 <Typography color={"#112846"}>
                   Upload Profile Picture
                 </Typography>
-                <InputLabelContainer htmlFor="AgentsAdminProfilePicture">
-                  <UploadFileIcon style={{ marginRight: "5px" }} />
-                  <Input
-                    type="file"
-                    id="AgentsAdminProfilePicture"
-                    onChange={uploadAgentsAdminProfilePicture}
-                    style={{ display: "none" }}
-                  />
-                </InputLabelContainer>
+                <div
+                  style={{
+                    padding: "2rem",
+                    background: "#f0f0f0",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    border: "2px dashed #97dce6",
+                    height: "130px",
+                    width: "130px",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    margin: "1.5rem auto",
+                  }}
+                  onMouseEnter={(event) => {
+                    event.target.style.border = "2px solid #97dce6";
+                  }}
+                  onMouseLeave={(event) => {
+                    event.target.style.border = "2px dashed #97dce6";
+                  }}
+                >
+                  <label
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => uploadAgentsAdminProfilePicture(e)}
+                    />
+                    {agentProfilePictureImage ? (
+                      <img
+                        src={agentProfilePictureImage}
+                        width={150}
+                        height={150}
+                        alt="fileName"
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CloudUploadIcon
+                          style={{
+                            color: "#12596B",
+                            fontSize: 50,
+                            cursor: "pointer",
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 10,
+                            marginTop: 5,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Upload Image
+                        </span>
+                      </div>
+                    )}
+                  </label>
+                </div>
               </InputContainer>
-              <InputContainer>
-                <Typography color={"#112846"}>Upload Agent Uniform</Typography>
-                <InputLabelContainer htmlFor="AgentsUniformUpload">
-                  <UploadFileIcon style={{ marginRight: "5px" }} />
-                  <Input
-                    type="file"
-                    id="AgentsUniformUpload"
-                    onChange={uploadAgentsUniform}
-                    style={{ display: "none" }}
-                  />
-                </InputLabelContainer>
-              </InputContainer>
+              <InputContainerUploadFile>
+                <Typography color={"#112846"} sx={{ flex: "1" }}>
+                  Upload Agent's File
+                </Typography>
+                <TextField
+                  sx={{ flex: "2" }}
+                  type="file"
+                  fullWidth
+                  onChange={uploadAgentsFile}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment>
+                        <IconButton>
+                          <UploadFileIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </InputContainerUploadFile>
+              <InputContainerUploadFile>
+                <Typography color={"#112846"} sx={{ flex: "1" }}>
+                  Upload Owner's File
+                </Typography>
+                <TextField
+                  sx={{ flex: "2" }}
+                  type="file"
+                  fullWidth
+                  onChange={uploadOwnerFile}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment>
+                        <IconButton>
+                          <UploadFileIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </InputContainerUploadFile>
             </FileContainer>
           </WholeInputContainer>
           <ApplyButton onClick={createDocument}>Submit Application</ApplyButton>

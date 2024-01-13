@@ -33,7 +33,7 @@ const createEmployee = async (req, res) => {
       employeeUpdated,
       { runValidators: true, new: true }
     );
-    res.status(StatusCodes.CREATED).json({ updatedEmployee });
+    res.status(StatusCodes.CREATED).json(updatedEmployee);
     return;
   }
   const employee = await EmployeeSchema.create(req.body);
@@ -44,7 +44,7 @@ const createEmployee = async (req, res) => {
     );
   }
   await employee.save();
-  res.status(StatusCodes.CREATED).json({ employee });
+  res.status(StatusCodes.CREATED).json(employee);
 };
 
 const getAllEmployees = async (req, res) => {

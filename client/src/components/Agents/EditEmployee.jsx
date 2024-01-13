@@ -73,20 +73,11 @@ const EditEmployee = () => {
       )
       .then((response) => {
         console.log(response);
-        toast.success("User updated successfully");
-        setTimeout(() => {
-          setEmployees({
-            firstName: "",
-            middleName: "",
-            lastName: "",
-            email: "",
-            phoneNumber: "",
-          });
-        }, 4000);
+        toast.success("Employee updated successfully");
       })
       .catch((error) => {
-        console.log(error);
-        toast.error("Error while updating");
+        console.log(error.response.data.msg);
+        toast.error(error.response.data.msg);
       });
   };
 

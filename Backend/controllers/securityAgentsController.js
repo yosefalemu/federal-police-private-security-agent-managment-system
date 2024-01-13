@@ -42,6 +42,22 @@ const getSingleAgentByName = async (req, res) => {
   }
 };
 
+const getAgentByUserIdAndUpdate = async (req, res) => {
+  const userId = req.params.userId;
+  console.log("userId", userId);
+  console.log("body for agent", req.body);
+  const { dataToBeUpdated } = req.body;
+  const updatedAgent = await AgentSchema.findOneAndUpdate(
+    { userId: userId },
+    dataToBeUpdated,
+    { runValidators: true, new: true }
+  );
+  if (!updateAgent) {
+    throw BadRequestError(`There is no agent with userID ${userId}`);
+  }
+  res.status(StatusCodes.OK).json(updatedAgent);
+};
+
 const getAgentWithEmail = async (req, res) => {
   const email = req.params.email;
   const agent = await AgentSchema.findOne({ email: email });
@@ -70,6 +86,7 @@ module.exports = {
   getAllAgents,
   getSingleAgent,
   getSingleAgentByName,
+  getAgentByUserIdAndUpdate,
   getAgentWithEmail,
   updateAgent,
 };

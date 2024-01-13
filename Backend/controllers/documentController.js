@@ -8,19 +8,25 @@ const CustomError = require("../errors");
 const path = require("path");
 
 const createDocument = async (req, res) => {
-  const { email, firstName, middleName, lastName } = req.body;
+  const { email, nationalId } = req.body;
+
   const documentExists = await DocumentSchema.findOne({
-    $or: [{ email }],
+    $or: [{ email }, { nationalId }],
   });
+
   if (documentExists) {
     if (documentExists.email === email) {
-      throw new BadRequestError("the email is already exist in the doucments");
+      throw new BadRequestError("The email is already exist in the documents");
+    } else if (documentExists.nationalId === nationalId) {
+      throw new BadRequestError(
+        "The national ID is already exist in the documents"
+      );
     }
   }
+
   const document = await DocumentSchema.create(req.body);
 
   if (document) {
-    await document.save();
     res.status(StatusCodes.CREATED).json({ document });
   } else {
     res.status(400);
@@ -64,6 +70,8 @@ const acceptDocument = async (req, res) => {
     firstName,
     middleName,
     lastName,
+    nationalId,
+    dateOfBirth,
     profilePicture,
     email,
     phoneNumber,
@@ -95,6 +103,8 @@ const acceptDocument = async (req, res) => {
     firstName,
     middleName,
     lastName,
+    dateOfBirth,
+    nationalId,
     profilePicture,
     email,
     phoneNumber,
@@ -123,9 +133,10 @@ const acceptDocument = async (req, res) => {
 };
 
 const rejectDocument = async (req, res) => {
-  const { id: documentId } = req.params;
+  const { documentId } = req.params;
 
   const subject = "Rejection of application";
+  console.log("log in the rejection", req.body);
   const { text } = req.body;
   const document = await DocumentSchema.findByIdAndDelete({ _id: documentId });
   const { email } = document;
@@ -134,8 +145,21 @@ const rejectDocument = async (req, res) => {
     throw new NotFoundError(`No document with id : ${documentId}`);
   }
   sendNotificationEmail({ email, subject, text });
-  // await document.remove();
   res.status(StatusCodes.OK).json({ msg: "Success! application rejected." });
+};
+const rejectDocumentByAdmin = async (req, res) => {
+  const { documentId } = req.params;
+  const document = await DocumentSchema.findByIdAndUpdate(
+    { _id: documentId },
+    {
+      checked: false,
+    },
+    { runValidators: true, new: true }
+  );
+  if (!document) {
+    throw new BadRequestError(`There is no document with id ${documentId}`);
+  }
+  res.status(StatusCodes.OK).json(document);
 };
 const uploadFile = async (req, res) => {
   if (!req.files) {
@@ -202,6 +226,7 @@ module.exports = {
   getSingleDocument,
   acceptDocument,
   rejectDocument,
+  rejectDocumentByAdmin,
   uploadFile,
   checkDocument,
   findUncheckedDocuments,

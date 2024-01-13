@@ -27,6 +27,7 @@ const agentRouter = require("./routes/securityAgentRoutes");
 const documentRouter = require("./routes/documentRoutes");
 const messageRouter = require("./routes/messageRoute");
 const conversationRouter = require("./routes/conversationRoute");
+const employeeAgentRouter = require("./routes/previousEmployeedRoute");
 
 // middleware
 const notFoundMiddleware = require("./middlewares/not-found");
@@ -75,6 +76,7 @@ app.use("/api/v1/agents", agentRouter);
 app.use("/api/v1/documents", documentRouter);
 app.use("/api/v1/conversation", conversationRouter);
 app.use("/api/v1/message", messageRouter);
+app.use("/api/v1/employeeagent", employeeAgentRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

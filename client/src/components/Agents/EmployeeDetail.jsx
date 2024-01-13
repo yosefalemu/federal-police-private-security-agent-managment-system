@@ -11,12 +11,18 @@ const ListItemForModal = styled(ListItem)({
   alignItems: "center",
   gap: "20px",
 });
+const ListItemForModalPreviousAgents = styled(ListItem)({
+  display: "flex",
+  alignItems: "flex-start",
+  gap: "20px",
+});
 
 const EmployeeDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [employees, setEmployees] = useState({});
   const [agent, setAgent] = useState({});
+  const [previousAgents, setPreviousAgents] = useState([]);
   const { currentAgentId } = useSelector((state) => state.agent);
   const { role } = useSelector((state) => state.user.user);
   const { from } = useSelector((state) => state.agent);
@@ -36,6 +42,26 @@ const EmployeeDetail = () => {
         });
     };
     getSingleAgentEmployee();
+  }, []);
+
+  useEffect(() => {
+    const getEmployeePreviousAgents = () => {
+      axios
+        .get(
+          `http://localhost:5000/api/v1/employeeagent/employeePreviousAgents/${id}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          setPreviousAgents(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    getEmployeePreviousAgents();
   }, []);
 
   useEffect(() => {
@@ -354,24 +380,61 @@ const EmployeeDetail = () => {
               </Typography>
             </ListItemForModal>
             {role === "admin" && (
-              <ListItemForModal>
-                <Typography
-                  variant="h6"
-                  flex={4}
-                  sx={{ color: "#112846" }}
-                  fontWeight={500}
-                >
-                  National Id:
-                </Typography>
-                <Typography
-                  variant="body1"
-                  flex={4}
-                  sx={{ color: "#112846" }}
-                  fontWeight={400}
-                >
-                  {employees?.nationalId}
-                </Typography>
-              </ListItemForModal>
+              <Box>
+                <ListItemForModal>
+                  <Typography
+                    variant="h6"
+                    flex={4}
+                    sx={{ color: "#112846" }}
+                    fontWeight={500}
+                  >
+                    National Id:
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    flex={4}
+                    sx={{ color: "#112846" }}
+                    fontWeight={400}
+                  >
+                    {employees?.nationalId}
+                  </Typography>
+                </ListItemForModal>
+                <ListItemForModalPreviousAgents>
+                  <Typography
+                    variant="h6"
+                    flex={4}
+                    sx={{ color: "#112846" }}
+                    fontWeight={500}
+                  >
+                    Previous Agents:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      alignItems: "flex-start",
+                    }}
+                    flex={4}
+                  >
+                    {previousAgents?.map((item) => (
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#112846",
+                          background: "lightgray",
+                          marginBottom: "5px",
+                          padding: "5px 10px",
+                          borderRadius: "5px",
+                        }}
+                        fontWeight={400}
+                      >
+                        {item?.agentName}
+                      </Typography>
+                    ))}
+                  </Box>
+                </ListItemForModalPreviousAgents>
+              </Box>
             )}
           </List>
         </Box>

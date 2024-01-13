@@ -227,8 +227,12 @@ export default function Header() {
               color="inherit"
             >
               <Avatar
-                alt="Profile"
-                src={`${PF}uploads/${user.profilePicture}`}
+                alt=""
+                src={
+                  user?.profilePicture
+                    ? `${PF}uploads/${user.profilePicture}`
+                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGst2EJfEU4M83w0oCJ0mpZ1O_n8jpiuvjOO4IvOFgRA&s"
+                }
                 sx={{ width: 50, height: 50 }}
               />
             </IconButton>

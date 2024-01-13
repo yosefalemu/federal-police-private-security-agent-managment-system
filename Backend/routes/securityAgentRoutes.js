@@ -10,6 +10,7 @@ const {
   getAgentWithEmail,
   updateAgent,
   getSingleAgentByName,
+  getAgentByUserIdAndUpdate,
 } = require("../controllers/securityAgentsController");
 
 router
@@ -34,5 +35,12 @@ router
 router
   .route("/getAgentName")
   .post(authenticateUser, authorizePermissions("admin"), getSingleAgentByName);
+router
+  .route("/updateAgentFromUser/:userId")
+  .patch(
+    authenticateUser,
+    authorizePermissions("agent"),
+    getAgentByUserIdAndUpdate
+  );
 
 module.exports = router;

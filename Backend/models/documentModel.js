@@ -26,6 +26,10 @@ const DocumentSchema = new mongoose.Schema(
       minlength: [3, "name must be minimum length of 3"],
       maxlength: [50, "name must be maximum length of 50"],
     },
+    dateOfBirth: {
+      type: String,
+      required: [true, "please provide date of birth"],
+    },
     email: {
       type: String,
       match: [
@@ -33,6 +37,10 @@ const DocumentSchema = new mongoose.Schema(
         "please provide valid email",
       ],
       unique: true,
+    },
+    nationalId: {
+      type: String,
+      required: [true, "please provide national id"],
     },
     phoneNumber: {
       type: String,
@@ -51,6 +59,10 @@ const DocumentSchema = new mongoose.Schema(
         type: String,
         required: [true, "please provide kebele"],
       },
+      houseNumber: {
+        type: String,
+        required: [true, "please provide house number"],
+      },
     },
     agentLogo: {
       type: String,
@@ -60,7 +72,6 @@ const DocumentSchema = new mongoose.Schema(
       type: String,
       required: [true, "upload all files scanned and merged"],
     },
-
     ownerFile: {
       type: String,
       required: [true, "please provide all the scanned and merged files"],

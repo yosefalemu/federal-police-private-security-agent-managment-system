@@ -8,6 +8,7 @@ const {
   getAdminFromUser,
   getAllUsers,
   getSingleUser,
+  updateUserByAdmin,
   showCurrentUser,
   updateUser,
   updateProfile,
@@ -36,5 +37,8 @@ router
     authorizePermissions("agent", "admin"),
     getAdminFromUser
   );
+router
+  .route("/updateUserByAdmin/:userId")
+  .patch(authenticateUser, authorizePermissions("admin"), updateUserByAdmin);
 
 module.exports = router;

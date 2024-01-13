@@ -10,6 +10,10 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Modal,
+  styled,
+  Button,
+  Typography,
 } from "@mui/material";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
 import React, { useEffect, useState } from "react";
@@ -19,13 +23,49 @@ import axios from "axios";
 import { removeFrom, setFrom } from "../../redux-toolkit/slices/agents";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
+import toast from "react-hot-toast";
+
+const ConfirmModalContainer = styled(Modal)({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+const ConfirmModalWrapper = styled(Box)({
+  background: "#fff",
+  height: "fit-content",
+  borderRadius: "5px",
+  padding: "20px",
+});
+
+const ConfirmButton = styled(Button)({
+  background: "#112846",
+  color: "#fff",
+  variant: "contained",
+  "&:hover": {
+    background: "#192E77",
+  },
+});
+const CancelButton = styled(Button)({
+  background: "red",
+  color: "#fff",
+  variant: "contained",
+  "&:hover": {
+    background: "#c9302c",
+  },
+});
 
 const AllUsers = () => {
   const dispatch = useDispatch();
+  const { role } = useSelector((state) => state.user.user);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchByNationalId, setSearchByNationalId] = useState("");
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [persmission, setPersmission] = useState("");
+  const [email, setEmail] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,6 +97,35 @@ const AllUsers = () => {
   useEffect(() => {
     dispatch(removeFrom());
   }, []);
+
+  const handleUpdateUserPersmission = () => {
+    const dataToBeUpdated = { persmission, email };
+    axios
+      .patch(
+        `http://localhost:5000/api/v1/users/updateUserByAdmin/${userId}`,
+        { dataToBeUpdated },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        toast.success("User updated successfully");
+        setTimeout(() => {
+          setConfirmModal(false);
+          navigate("/allusers");
+        }, 4000);
+
+        console.log("updated data with permission", response);
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Can't update the user");
+        setTimeout(() => {
+          setConfirmModal(false);
+          navigate("/allusers");
+        }, 4000);
+      });
+  };
 
   if (users.length === 0) {
     return <Box>No Users</Box>;
@@ -124,7 +193,7 @@ const AllUsers = () => {
               </TableCell>
               <TableCell sx={{ color: "#112846", width: "3%" }}>Edit</TableCell>
               <TableCell sx={{ color: "#112846", width: "3%" }}>
-                Delete
+                Permission
               </TableCell>
               <TableCell sx={{ color: "#112846", width: "3%" }}>
                 Details
@@ -180,15 +249,31 @@ const AllUsers = () => {
                     </IconButton>
                   </TableCell>
                   <TableCell sx={{ width: "3%" }}>
-                    <IconButton
-                      sx={{ color: "red" }}
-                      onClick={() => {
-                        navigate(`/allusers/${item._id}`);
-                        dispatch(setFrom("allemployee"));
-                      }}
-                    >
-                      <DeleteForeverIcon />
-                    </IconButton>
+                    {item.persmission === "allowed" ? (
+                      <IconButton
+                        sx={{ color: "green" }}
+                        onClick={() => {
+                          setUserId(item?._id);
+                          setPersmission("blocked");
+                          setEmail(item?.email);
+                          setConfirmModal(true);
+                        }}
+                      >
+                        <ThumbUpAltIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        sx={{ color: "orange" }}
+                        onClick={() => {
+                          setUserId(item?._id);
+                          setPersmission("allowed");
+                          setEmail(item?.email);
+                          setConfirmModal(true);
+                        }}
+                      >
+                        <DoDisturbIcon />
+                      </IconButton>
+                    )}
                   </TableCell>
                   <TableCell sx={{ width: "3%" }}>
                     <IconButton
@@ -207,6 +292,43 @@ const AllUsers = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <ConfirmModalContainer
+        open={confirmModal}
+        onClose={() => setConfirmModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <ConfirmModalWrapper
+          width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
+        >
+          <Box>
+            <Typography textAlign={"center"} fontSize={24}>
+              Are you sure to update user permissions?
+            </Typography>
+            <Box
+              sx={{
+                marginTop: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <CancelButton
+                variant="contained"
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </CancelButton>
+              <ConfirmButton
+                variant="contained"
+                onClick={handleUpdateUserPersmission}
+              >
+                Confirm
+              </ConfirmButton>
+            </Box>
+          </Box>
+        </ConfirmModalWrapper>
+      </ConfirmModalContainer>
     </Box>
   );
 };

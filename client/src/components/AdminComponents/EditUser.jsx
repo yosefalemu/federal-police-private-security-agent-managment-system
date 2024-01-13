@@ -25,9 +25,9 @@ const UpdateButton = styled(Button)({
 
 const EditUser = () => {
   const { id } = useParams();
+  const [newPassword, setNewPassword] = useState("");
 
   const userstatus = [
-    { value: "agent", label: "Agent" },
     { value: "screener", label: "Screener" },
     { value: "admin", label: "Admin" },
   ];
@@ -38,6 +38,7 @@ const EditUser = () => {
     email: "",
     phoneNumber: "",
     status: "",
+    password: "",
   });
   useEffect(() => {
     const getSingleUser = () => {
@@ -48,6 +49,7 @@ const EditUser = () => {
         .then((response) => {
           console.log(response);
           setUsers(response.data);
+          setNewPassword(response.data.password);
         })
         .catch((error) => {
           console.log(error);
@@ -64,26 +66,29 @@ const EditUser = () => {
     });
   };
 
-  const handleUpdateEmployee = () => {
-    console.log("employees to be updated", users);
+  const handleUpdateUser = () => {
+    const dataToBeUpdated = {
+      firstName: users.firstName,
+      middleName: users.middleName,
+      lastName: users.lastName,
+      email: users.email,
+      phoneNumber: users.phoneNumber,
+      role: users.role,
+      password: users.password,
+    };
+    if (newPassword !== users.password) {
+      dataToBeUpdated.newPasswordToUpdated = newPassword;
+    }
+
     axios
       .patch(
-        `http://localhost:5000/api/v1/employees/updateEmployee/${users?._id}`,
-        { users },
+        `http://localhost:5000/api/v1/users/updateUserByAdmin/${users?._id}`,
+        { dataToBeUpdated },
         { withCredentials: true }
       )
       .then((response) => {
         console.log(response);
         toast.success("User updated successfully");
-        setTimeout(() => {
-          setUsers({
-            firstName: "",
-            middleName: "",
-            lastName: "",
-            email: "",
-            phoneNumber: "",
-          });
-        }, 4000);
       })
       .catch((error) => {
         console.log(error);
@@ -152,6 +157,16 @@ const EditUser = () => {
           onChange={(e) => handleFormChange(e)}
           sx={{ backgroundColor: "#f7f7f7", marginTop: 0, marginBottom: 2 }}
         />
+        <InputLabel htmlFor="password">Password</InputLabel>
+        <TextField
+          id="password"
+          name="password"
+          value={newPassword}
+          fullWidth
+          margin="normal"
+          onChange={(e) => setNewPassword(e.target.value)}
+          sx={{ backgroundColor: "#f7f7f7", marginTop: 0, marginBottom: 2 }}
+        />
         <InputLabel htmlFor="role">Role</InputLabel>
         <TextField
           name="role"
@@ -172,7 +187,7 @@ const EditUser = () => {
           variant="contained"
           size="large"
           fullWidth
-          onClick={handleUpdateEmployee}
+          onClick={handleUpdateUser}
         >
           Update
         </UpdateButton>

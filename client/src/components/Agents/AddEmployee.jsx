@@ -134,6 +134,7 @@ const AddEmployee = () => {
   };
 
   const { email } = useSelector((state) => state.user.user);
+
   useEffect(() => {
     axios
       .get(`http://localhost:5000/api/v1/agents/getagentwithemail/${email}`, {
@@ -180,22 +181,41 @@ const AddEmployee = () => {
       )
       .then((response) => {
         console.log(response);
-        toast.success("Employee created successfully");
-        setLoading(false);
-        setUser({
-          firstName: "",
-          middleName: "",
-          lastName: "",
-          email: "",
-          phoneNumber: "",
-          nationalId: "",
-        });
-        setImage(null);
-        setEmergencyImage(null);
-        setEmployeeImage(null);
-        setProfilePicture("");
-        setEmployeeId("");
-        setCosignerId("");
+        axios
+          .post(
+            "http://localhost:5000/api/v1/employeeagent/createEmployeeAgent",
+            {
+              employeeId: response.data._id,
+              agentId: agent._id,
+              agentName: agent?.agentName,
+            },
+            { withCredentials: true }
+          )
+          .then((response) => {
+            console.log(
+              "final response including add employee to agent",
+              response.data
+            );
+            toast.success("Employee created successfully");
+            setLoading(false);
+            setUser({
+              firstName: "",
+              middleName: "",
+              lastName: "",
+              email: "",
+              phoneNumber: "",
+              nationalId: "",
+            });
+            setImage(null);
+            setEmergencyImage(null);
+            setEmployeeImage(null);
+            setProfilePicture("");
+            setEmployeeId("");
+            setCosignerId("");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         setLoading(false);

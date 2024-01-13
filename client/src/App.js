@@ -23,6 +23,7 @@ import ChatPage from "./pages/ChatPage.jsx";
 import CerteficateGeneratorPage from "./pages/AdminPages/CerteficateGeneratorPage.jsx";
 import EditEmployeeList from "./pages/Agents/EditEmployeeList.jsx";
 import EditUserPage from "./pages/AdminPages/EditUserPage.jsx";
+import ApplyAssistancePage from "./pages/ApplyAssistancePage.jsx";
 
 function App() {
   return (
@@ -38,9 +39,13 @@ function App() {
         <Route path="/agentemployee" element={<EmployeePage />} />
         <Route path="/addemployee" element={<AddEmployeePage />} />
         <Route path="/createuser" element={<CreateUserPage />} />
-        <Route path="/agentsfile" element={<AgentFliesPage />} />
-        <Route path="/adminfile" element={<AdminFliePage />} />
-        <Route path="/agentdetail" element={<AgentsDetailPage />} />
+        <Route path="/screenerrequest/agentfile" element={<AgentFliesPage />} />
+        <Route path="/screenerrequest/adminfile" element={<AdminFliePage />} />
+        <Route path="/adminRequest/agentfile" element={<AgentFliesPage />} />
+        <Route path="/adminRequest/adminfile" element={<AdminFliePage />} />
+        <Route path="/agentslist/agentfile" element={<AgentFliesPage />} />
+        <Route path="/agentslist/adminfile" element={<AdminFliePage />} />
+        <Route path="/agentslist/agentdetail" element={<AgentsDetailPage />} />
         <Route path="/allemployee/:id" element={<EmployeeDetailPage />} />
         <Route path="/agentslist/:id" element={<AgentEmployeePage />} />
         <Route
@@ -51,7 +56,14 @@ function App() {
         <Route path="/adduser" element={<AddUserPage />} />
         <Route path="/allusers" element={<AllUsersPage />} />
         <Route path="/allusers/:id" element={<UserDetailPage />} />
-        <Route path="/applicationdetail" element={<ApplicationDetail />} />
+        <Route
+          path="/screenerrequest/applicationdetail"
+          element={<ApplicationDetail />}
+        />
+        <Route
+          path="/adminRequest/applicationdetail"
+          element={<ApplicationDetail />}
+        />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/certeficate" element={<CerteficateGeneratorPage />} />
         <Route
@@ -59,6 +71,7 @@ function App() {
           element={<EditEmployeeList />}
         />
         <Route path="/allusers/editemployee/:id" element={<EditUserPage />} />
+        <Route path="/applyassistance" element={<ApplyAssistancePage />} />
       </Routes>
     </Router>
   );

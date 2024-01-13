@@ -30,7 +30,11 @@ import {
 import toast from "react-hot-toast";
 import { setCurrentDocument } from "../../redux-toolkit/slices/document";
 import { useNavigate } from "react-router-dom";
-import { setAgentName } from "../../redux-toolkit/slices/agents";
+import {
+  removeFrom,
+  setAgentName,
+  setFrom,
+} from "../../redux-toolkit/slices/agents";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -38,6 +42,17 @@ const ConfirmModalContainer = styled(Modal)({
   justifyContent: "center",
 });
 const ConfirmModalWrapper = styled(Box)({
+  background: "#fff",
+  height: "fit-content",
+  borderRadius: "5px",
+  padding: "20px",
+});
+const DeclineModalContainer = styled(Modal)({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+const DeclineModalWrapper = styled(Box)({
   background: "#fff",
   height: "fit-content",
   borderRadius: "5px",
@@ -69,6 +84,10 @@ const AdminRequest = () => {
   const [allRequests, setAllRequests] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
   const [declineModal, setDeclineModal] = useState(false);
+
+  useEffect(() => {
+    dispatch(removeFrom());
+  }, []);
   useEffect(() => {
     const getAllRequestScreenerRequestList = () => {
       axios
@@ -109,7 +128,24 @@ const AdminRequest = () => {
         console.log(error);
       });
   };
-
+  const handledRejectRequest = () => {
+    axios
+      .patch(
+        `http://localhost:5000/api/v1/documents/rejectDocumentByAdmin/${confirmId}`,
+        null,
+        { withCredentials: true }
+      )
+      .then((response) => {
+        console.log(response);
+        toast.success("Document reject successefully");
+        setDeclineModal(false);
+      })
+      .catch((error) => {
+        toast.error("error while rejecting the document");
+        setDeclineModal(false);
+        console.log(error);
+      });
+  };
   console.log("allRequests", allRequests);
   return (
     <Box>
@@ -220,7 +256,7 @@ const AdminRequest = () => {
                   <IconButton
                     sx={{ color: "#EF9630" }}
                     component={Link}
-                    to="/applicationdetail"
+                    to="/adminRequest/applicationdetail"
                     onClick={() => {
                       dispatch(setCurrentDocument(item._id));
                     }}
@@ -232,8 +268,9 @@ const AdminRequest = () => {
                   <IconButton
                     sx={{ color: "#EF9630" }}
                     component={Link}
-                    to="/agentsfile"
+                    to="/adminRequest/agentfile"
                     onClick={() => {
+                      dispatch(setFrom("adminRequest"));
                       dispatch(setAgentFile(item?.agentFile));
                     }}
                   >
@@ -243,9 +280,10 @@ const AdminRequest = () => {
                 <TableCell sx={{ width: "12%", textAlign: "center" }}>
                   <IconButton
                     component={Link}
-                    to="/adminfile"
+                    to="/adminRequest/adminfile"
                     sx={{ color: "#EF9630" }}
                     onClick={() => {
+                      dispatch(setFrom("adminRequest"));
                       dispatch(setAdminFile(item?.ownerFile));
                     }}
                   >
@@ -265,7 +303,14 @@ const AdminRequest = () => {
                   </IconButton>
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
-                  <IconButton sx={{ color: "red" }}>
+                  <IconButton
+                    sx={{ color: "red" }}
+                    onClick={() => {
+                      dispatch(setConfirmId(item?._id));
+                      dispatch(setAgentName(item?.agentName));
+                      setDeclineModal(true);
+                    }}
+                  >
                     <DeleteForeverIcon />
                   </IconButton>
                 </TableCell>
@@ -308,6 +353,40 @@ const AdminRequest = () => {
           </Box>
         </ConfirmModalWrapper>
       </ConfirmModalContainer>
+      <DeclineModalContainer
+        open={declineModal}
+        onClose={() => setDeclineModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <DeclineModalWrapper
+          width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
+        >
+          <Box>
+            <Typography textAlign={"center"} fontSize={24}>
+              Are you sure?
+            </Typography>
+            <Box
+              sx={{
+                marginTop: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <CancelButton
+                variant="contained"
+                onClick={() => setDeclineModal(false)}
+              >
+                Cancel
+              </CancelButton>
+              <ConfirmButton variant="contained" onClick={handledRejectRequest}>
+                Confirm
+              </ConfirmButton>
+            </Box>
+          </Box>
+        </DeclineModalWrapper>
+      </DeclineModalContainer>
     </Box>
   );
 };
