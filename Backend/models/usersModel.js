@@ -62,6 +62,10 @@ const UserSchema = new mongoose.Schema(
       enum: ["allowed", "blocked"],
       default: "allowed",
     },
+    emailPass: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

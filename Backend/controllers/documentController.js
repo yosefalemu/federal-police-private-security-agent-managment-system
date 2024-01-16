@@ -6,6 +6,9 @@ const sendNotificationEmail = require("../mailServices/sendNotificationEmail");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const path = require("path");
+const emailConfig = require("../mailServices/emailConfig");
+const sendEmailRequestAccepted = require("../mailServices/sendEmailRequestAcceptance");
+const sendEmailRequestDeclined = require("../mailServices/sendEmailRequestDeclined");
 
 const createDocument = async (req, res) => {
   const { email, nationalId } = req.body;
@@ -19,7 +22,7 @@ const createDocument = async (req, res) => {
       throw new BadRequestError("The email is already exist in the documents");
     } else if (documentExists.nationalId === nationalId) {
       throw new BadRequestError(
-        "The national ID is already exist in the documents"
+        "The national ID is already exist please use reapply"
       );
     }
   }
@@ -58,8 +61,20 @@ const getSingleDocument = async (req, res) => {
   }
 };
 
+const getSingleDocumentByNationalId = async (req, res) => {
+  const { nationalId } = req.params;
+  const document = await DocumentSchema.findOne({ nationalId: nationalId });
+  if (!document) {
+    throw new BadRequestError(`there is no Document with id ${nationalId}`);
+  }
+  res.status(201).json(document);
+};
+
 const acceptDocument = async (req, res) => {
   const id = req.params.id;
+  const { approvedBy, emailPass, senderEmail } = req.body;
+  console.log("approved by", approvedBy);
+  console.log("email pass", emailPass);
   const document = await DocumentSchema.findById(id);
   console.log("document", document);
   const {
@@ -72,6 +87,7 @@ const acceptDocument = async (req, res) => {
     lastName,
     nationalId,
     dateOfBirth,
+    checkedBy,
     profilePicture,
     email,
     phoneNumber,
@@ -94,10 +110,16 @@ const acceptDocument = async (req, res) => {
 
   const password = generatePassword();
   console.log(password);
-  sendNotificationEmail({
+  const senderTransporter = emailConfig(senderEmail, emailPass);
+  sendEmailRequestAccepted({
+    transporter: senderTransporter,
     email: email,
     subject: "Approval of your document",
-    text: `Congradulations your application is approved, you can login as an agent using your email and this password:${password}`,
+    password: password,
+    senderEmail: senderEmail,
+    firstName: firstName,
+    middleName: middleName,
+    lastName: lastName,
   });
   const user = await UserSchema.create({
     firstName,
@@ -126,6 +148,8 @@ const acceptDocument = async (req, res) => {
     email,
     phoneNumber,
     address,
+    checkedBy,
+    approvedBy: approvedBy,
   });
   await agent.save();
   await document.save();
@@ -137,15 +161,32 @@ const rejectDocument = async (req, res) => {
 
   const subject = "Rejection of application";
   console.log("log in the rejection", req.body);
-  const { text } = req.body;
-  const document = await DocumentSchema.findByIdAndDelete({ _id: documentId });
-  const { email } = document;
-  console.log(email);
+  const { text, newUpdate, senderEmail, emailPass } = req.body;
+  const document = await DocumentSchema.findByIdAndUpdate(
+    { _id: documentId },
+    {
+      status: "rejected",
+      newUpdate: newUpdate,
+    },
+    { runValidators: true, new: true }
+  );
   if (!document) {
     throw new NotFoundError(`No document with id : ${documentId}`);
   }
-  sendNotificationEmail({ email, subject, text });
-  res.status(StatusCodes.OK).json({ msg: "Success! application rejected." });
+  const { email } = document;
+  console.log("reciever email", email);
+  const senderTransporter = emailConfig(senderEmail, emailPass);
+  sendEmailRequestDeclined({
+    transporter: senderTransporter,
+    email,
+    subject,
+    text,
+    senderEmail,
+    firstName: document.firstName,
+    middleName: document.middleName,
+    lastName: document.lastName,
+  });
+  res.status(StatusCodes.OK).json(document);
 };
 const rejectDocumentByAdmin = async (req, res) => {
   const { documentId } = req.params;
@@ -202,6 +243,25 @@ const checkDocument = async (req, res) => {
   }
   res.status(StatusCodes.OK).json({ updatedDocument });
 };
+
+const updatedDocumentByNationalId = async (req, res) => {
+  const { nationalId } = req.params;
+  console.log(req.body);
+  const updatedDocument = await DocumentSchema.findOneAndUpdate(
+    { nationalId: nationalId },
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!updatedDocument) {
+    throw new BadRequestError(
+      `No document with id ${nationalId} to be updated`
+    );
+  }
+  res.status(StatusCodes.OK).json({ updatedDocument });
+};
 const findUncheckedDocuments = async (req, res) => {
   const documents = await DocumentSchema.find({ checked: false });
   if (!documents) {
@@ -224,11 +284,13 @@ module.exports = {
   createDocument,
   getAllDocuments,
   getSingleDocument,
+  getSingleDocumentByNationalId,
   acceptDocument,
   rejectDocument,
   rejectDocumentByAdmin,
   uploadFile,
   checkDocument,
+  updatedDocumentByNationalId,
   findUncheckedDocuments,
   findcheckedDocuments,
 };

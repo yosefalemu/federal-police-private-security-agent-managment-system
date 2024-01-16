@@ -30,7 +30,14 @@ import {
   setConfirmId,
 } from "../../redux-toolkit/slices/fileSilce";
 import toast from "react-hot-toast";
-import { setCurrentDocument } from "../../redux-toolkit/slices/document";
+import {
+  setAllRequestDocument,
+  setCurrentDocument,
+} from "../../redux-toolkit/slices/document";
+import PendingIcon from "@mui/icons-material/Pending";
+import CloseIcon from "@mui/icons-material/Close";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -76,11 +83,17 @@ const CancelButton = styled(Button)({
 
 const AllScreenerRequestList = () => {
   const dispatch = useDispatch();
-  const { confirmId } = useSelector((state) => state.file);
+  const { requestDocuments } = useSelector((state) => state.document);
+  const { _id, email, emailPass } = useSelector((state) => state.user.user);
   const [allRequests, setAllRequests] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
   const [declineModal, setDeclineModal] = useState(false);
   const [rejectionReason, setRejectReason] = useState("");
+  const [confirmId, setConfirmId] = useState("");
+  const [confirmRequestId, setConfirmRequestId] = useState("");
+  const [deleteRequestId, setDeleteRequestId] = useState("");
+  const [connectorRequestId, setConnectorRequestId] = useState("");
+
   useEffect(() => {
     const getAllRequestScreenerRequestList = () => {
       axios
@@ -90,23 +103,26 @@ const AllScreenerRequestList = () => {
         .then((response) => {
           console.log(response);
           setAllRequests(response.data.documents);
+          dispatch(setAllRequestDocument(response.data.documents));
         })
         .catch((error) => {
           console.log(error);
         });
     };
     getAllRequestScreenerRequestList();
-  }, []);
+  }, [confirmId]);
 
   const handleConfirmRequest = () => {
     axios
       .patch(
         `http://localhost:5000/api/v1/documents/checkdocument/${confirmId}`,
-        { checked: true },
+        { checked: true, checkedBy: _id, newUpdate: false },
         { withCredentials: true }
       )
       .then((response) => {
         console.log(response);
+        setConfirmId("");
+        setConfirmRequestId(connectorRequestId);
         toast.success("request done successfully");
         setTimeout(() => {
           setConfirmModal(false);
@@ -121,18 +137,23 @@ const AllScreenerRequestList = () => {
       });
   };
 
-  const handleDeclinedRequest = () => {
+  const handleRejectRequest = () => {
     axios
-      .delete(
+      .patch(
         `http://localhost:5000/api/v1/documents/rejectDocument/${confirmId}`,
         {
-          data: { text: rejectionReason },
-          withCredentials: true,
-        }
+          text: rejectionReason,
+          newUpdate: false,
+          senderEmail: email,
+          emailPass,
+        },
+        { withCredentials: true }
       )
       .then((response) => {
         console.log(response);
-        toast.success("Request declined successfully");
+        setConfirmId("");
+        toast.success("Request Rejected successfully");
+        setDeleteRequestId(connectorRequestId);
         setTimeout(() => {
           setConfirmModal(false);
           setDeclineModal(false);
@@ -146,8 +167,19 @@ const AllScreenerRequestList = () => {
         console.log(error);
       });
   };
-
   console.log("allRequests", allRequests);
+  console.log("scrrenner items", requestDocuments);
+
+  const AllScreenerRequestListToDisplay = requestDocuments
+    .map((item) => {
+      if (item._id === deleteRequestId) {
+        return { ...item, status: "rejected" };
+      }
+      return item;
+    })
+    .filter((item) => item._id !== confirmRequestId)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
   return (
     <Box>
       <TableContainer component={Paper} sx={{ bgcolor: "#f7f7f7" }}>
@@ -175,9 +207,6 @@ const AllScreenerRequestList = () => {
               <TableCell sx={{ color: "#112846", width: "15%" }}>
                 Middle Name
               </TableCell>
-              <TableCell sx={{ color: "#112846", width: "12%" }}>
-                Last Name
-              </TableCell>
               <TableCell
                 sx={{
                   color: "#112846",
@@ -185,7 +214,10 @@ const AllScreenerRequestList = () => {
                   textAlign: "center",
                 }}
               >
-                Phone
+                Status
+              </TableCell>
+              <TableCell sx={{ color: "#112846", width: "12%" }}>
+                New Version
               </TableCell>
               <TableCell
                 sx={{
@@ -216,7 +248,7 @@ const AllScreenerRequestList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {allRequests?.map((item, index) => (
+            {AllScreenerRequestListToDisplay?.map((item, index) => (
               <TableRow key={index}>
                 <TableCell
                   sx={{
@@ -241,17 +273,34 @@ const AllScreenerRequestList = () => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    width: "12%",
+                    width: "10%",
+                    textAlign: "center",
                   }}
                 >
-                  {item.lastName}
+                  {item.status === "pending" ? (
+                    <Box sx={{ color: "orange" }}>
+                      <PendingIcon color="red" />
+                    </Box>
+                  ) : (
+                    <Box sx={{ color: "red" }}>
+                      <CloseIcon />
+                    </Box>
+                  )}
                 </TableCell>
                 <TableCell
                   sx={{
-                    width: "10%",
+                    width: "12%",
                   }}
                 >
-                  {item.phoneNumber}
+                  {item.newUpdate === "true" ? (
+                    <Box sx={{ textAlign: "center", color: "green" }}>
+                      <ThumbUpIcon />
+                    </Box>
+                  ) : (
+                    <Box sx={{ textAlign: "center", color: "red" }}>
+                      <ThumbDownIcon />
+                    </Box>
+                  )}
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
                   <IconButton
@@ -291,95 +340,130 @@ const AllScreenerRequestList = () => {
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
                   <IconButton
-                    sx={{ color: "green" }}
+                    disabled={item.status === "rejected"}
+                    sx={{
+                      color: "green",
+                      "&:disabled": {
+                        cursor: "not-allowed",
+                        pointerEvents: "all !important",
+                        color: "#00800080",
+                      },
+                    }}
                     onClick={() => {
-                      dispatch(setConfirmId(item?._id));
+                      setConfirmId(item?._id);
+                      setConnectorRequestId(item?._id);
                       setConfirmModal(true);
                     }}
                   >
                     <CheckIcon />
                   </IconButton>
                 </TableCell>
+
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
                   <IconButton
-                    sx={{ color: "red" }}
+                    disabled={item.status === "rejected"}
+                    sx={{
+                      color: "red",
+                      "&:disabled": {
+                        cursor: "not-allowed",
+                        pointerEvents: "all !important",
+                        color: "#FF000080",
+                      },
+                    }}
                     onClick={() => {
-                      dispatch(setConfirmId(item?._id));
+                      setConfirmId(item?._id);
+                      setConnectorRequestId(item?._id);
                       setDeclineModal(true);
                     }}
                   >
                     <DeleteForeverIcon />
                   </IconButton>
                 </TableCell>
+                <ConfirmModalContainer
+                  open={confirmModal}
+                  onClose={() => setConfirmModal(false)}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <ConfirmModalWrapper
+                    width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
+                  >
+                    <Box>
+                      <Typography textAlign={"center"} fontSize={24}>
+                        Are you sure?
+                      </Typography>
+                      <Box
+                        sx={{
+                          marginTop: "20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <CancelButton
+                          variant="contained"
+                          onClick={() => setConfirmModal(false)}
+                        >
+                          Cancel
+                        </CancelButton>
+                        <ConfirmButton
+                          variant="contained"
+                          onClick={() => {
+                            handleConfirmRequest();
+                          }}
+                        >
+                          Confirm
+                        </ConfirmButton>
+                      </Box>
+                    </Box>
+                  </ConfirmModalWrapper>
+                </ConfirmModalContainer>
+                <DeclineModalContainer
+                  open={declineModal}
+                  onClose={() => setDeclineModal(false)}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <DeclineModalWrapper
+                    width={{ xs: "90%", sm: "70%", md: "50%", lg: "55%" }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: "15px",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Typography
+                        variant="h5"
+                        textAlign={"center"}
+                        color={"#112846"}
+                      >
+                        Decline Reason
+                      </Typography>
+                      <Textarea
+                        minRows={6}
+                        sx={{ fontSize: "18px", marginBottom: "20px" }}
+                        placeholder="Send to decline reason to manager"
+                        onChange={(e) => setRejectReason(e.target.value)}
+                      />
+
+                      <ConfirmButton
+                        variant="contained"
+                        onClick={() => {
+                          handleRejectRequest();
+                        }}
+                      >
+                        Confirm
+                      </ConfirmButton>
+                    </Box>
+                  </DeclineModalWrapper>
+                </DeclineModalContainer>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <ConfirmModalContainer
-        open={confirmModal}
-        onClose={() => setConfirmModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <ConfirmModalWrapper
-          width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
-        >
-          <Box>
-            <Typography textAlign={"center"} fontSize={24}>
-              Are you sure?
-            </Typography>
-            <Box
-              sx={{
-                marginTop: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <CancelButton
-                variant="contained"
-                onClick={() => setConfirmModal(false)}
-              >
-                Cancel
-              </CancelButton>
-              <ConfirmButton variant="contained" onClick={handleConfirmRequest}>
-                Confirm
-              </ConfirmButton>
-            </Box>
-          </Box>
-        </ConfirmModalWrapper>
-      </ConfirmModalContainer>
-      <DeclineModalContainer
-        open={declineModal}
-        onClose={() => setDeclineModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <DeclineModalWrapper
-          width={{ xs: "90%", sm: "70%", md: "50%", lg: "35%" }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              gap: "15px",
-              flexDirection: "column",
-            }}
-          >
-            <Typography>Decline Reason</Typography>
-            <Textarea
-              minRows={5}
-              sx={{ fontSize: "18px", marginBottom: "20px" }}
-              placeholder="Send to decline reason to manager"
-              onChange={(e) => setRejectReason(e.target.value)}
-            />
-
-            <ConfirmButton variant="contained" onClick={handleDeclinedRequest}>
-              Confirm
-            </ConfirmButton>
-          </Box>
-        </DeclineModalWrapper>
-      </DeclineModalContainer>
     </Box>
   );
 };

@@ -198,6 +198,24 @@ const UserDetails = () => {
                 sx={{ color: "#112846" }}
                 fontWeight={500}
               >
+                Date Of Birth:
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {user?.dateOfBirth}
+              </Typography>
+            </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
                 Role:
               </Typography>
               <Typography

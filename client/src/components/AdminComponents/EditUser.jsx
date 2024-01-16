@@ -26,20 +26,13 @@ const UpdateButton = styled(Button)({
 const EditUser = () => {
   const { id } = useParams();
   const [newPassword, setNewPassword] = useState("");
+  const [users, setUsers] = useState({});
 
   const userstatus = [
     { value: "screener", label: "Screener" },
     { value: "admin", label: "Admin" },
   ];
-  const [users, setUsers] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    status: "",
-    password: "",
-  });
+
   useEffect(() => {
     const getSingleUser = () => {
       axios
@@ -47,7 +40,7 @@ const EditUser = () => {
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response);
+          console.log("to be updated", response);
           setUsers(response.data);
           setNewPassword(response.data.password);
         })
@@ -74,6 +67,7 @@ const EditUser = () => {
       email: users.email,
       phoneNumber: users.phoneNumber,
       role: users.role,
+      emailPass: users.emailPass,
       password: users.password,
     };
     if (newPassword !== users.password) {
@@ -95,11 +89,13 @@ const EditUser = () => {
         toast.error("Error while updating");
       });
   };
+
+  console.log("logged user", users);
   return (
     <Box sx={{ padding: "50px" }}>
       <Paper sx={{ width: "50%", margin: "auto", padding: "30px" }}>
         <Typography variant="h4" textAlign={"center"} color={"#112846"}>
-          Update Employee
+          Update User
         </Typography>
         <InputLabel htmlFor="firstName">First Name</InputLabel>
         <TextField
@@ -157,32 +153,46 @@ const EditUser = () => {
           onChange={(e) => handleFormChange(e)}
           sx={{ backgroundColor: "#f7f7f7", marginTop: 0, marginBottom: 2 }}
         />
+        <InputLabel htmlFor="phoneNumber">Email Pass</InputLabel>
+        <TextField
+          id="emailPass"
+          name="emailPass"
+          value={users.emailPass}
+          fullWidth
+          margin="normal"
+          onChange={(e) => handleFormChange(e)}
+          sx={{ backgroundColor: "#f7f7f7", marginTop: 0, marginBottom: 2 }}
+        />
         <InputLabel htmlFor="password">Password</InputLabel>
         <TextField
           id="password"
           name="password"
-          value={newPassword}
           fullWidth
           margin="normal"
           onChange={(e) => setNewPassword(e.target.value)}
           sx={{ backgroundColor: "#f7f7f7", marginTop: 0, marginBottom: 2 }}
         />
-        <InputLabel htmlFor="role">Role</InputLabel>
-        <TextField
-          name="role"
-          value={users.role}
-          onChange={(e) => handleFormChange(e)}
-          fullWidth
-          margin="normal"
-          sx={{ backgroundColor: "#f7f7f7", borderRadius: "16px" }}
-          select
-        >
-          {userstatus.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        {users.agent === "agent" && (
+          <>
+            <InputLabel htmlFor="role">Role</InputLabel>
+            <TextField
+              name="role"
+              value={users.role}
+              onChange={(e) => handleFormChange(e)}
+              fullWidth
+              margin="normal"
+              sx={{ backgroundColor: "#f7f7f7", borderRadius: "16px" }}
+              select
+            >
+              {userstatus.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </>
+        )}
+
         <UpdateButton
           variant="contained"
           size="large"

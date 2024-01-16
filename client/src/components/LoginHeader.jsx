@@ -40,6 +40,7 @@ export default function LoginHeader() {
             aria-controls="primary-search-account-menu"
             aria-haspopup="true"
             color="inherit"
+            sx={{ width: "25%" }}
           >
             <Avatar
               alt="FederalPolice"
@@ -60,25 +61,42 @@ export default function LoginHeader() {
                 fontSize: "24px",
               },
             }}
+            textAlign={"center"}
           >
             Private Security Agent HR Managment System
           </Typography>
-
-          <Button
-            sx={{
-              background: "#112846",
-              color: "#F6F5F5",
-              marginRight: "25px",
-              "&:hover": {
-                background: "#192E77",
-              },
-            }}
-            variant="contained"
-            component={Link}
-            to="/applyassistance"
-          >
-            Apply
-          </Button>
+          <Box>
+            <Button
+              sx={{
+                background: "#112846",
+                color: "#F6F5F5",
+                marginRight: "25px",
+                "&:hover": {
+                  background: "#192E77",
+                },
+              }}
+              variant="contained"
+              component={Link}
+              to="/applyassistance"
+            >
+              Apply
+            </Button>
+            <Button
+              sx={{
+                background: "#112846",
+                color: "#F6F5F5",
+                marginRight: "25px",
+                "&:hover": {
+                  background: "#192E77",
+                },
+              }}
+              variant="contained"
+              component={Link}
+              to="/reapplyassistance"
+            >
+              ReApply
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>

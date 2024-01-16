@@ -1,6 +1,7 @@
 const Conversation = require("../models/conversationModel");
 const { BadRequestError } = require("../errors");
 const socketIo = require("../socket");
+const { StatusCodes } = require("http-status-codes");
 
 const createConversation = async (req, res) => {
   console.log(req.body);
@@ -34,7 +35,27 @@ const getConversation = async (req, res) => {
   res.status(200).json(conversation);
 };
 
+const updateConversation = async (req, res) => {
+  const { conversationId } = req.params;
+  console.log("conversation id", conversationId);
+  const updatedAt = Date.now();
+  const updatedConversation = await Conversation.findOneAndUpdate(
+    { _id: conversationId },
+    { updatedAt },
+    {
+      runValidators: true,
+      new: true,
+    }
+  );
+  if (!updatedConversation) {
+    throw BadRequestError(`There is no conversation with id ${conversationId}`);
+  }
+  console.log("updatedConversation", updatedConversation);
+  res.status(StatusCodes.OK).json(updatedConversation);
+};
+
 module.exports = {
   createConversation,
   getConversation,
+  updateConversation,
 };

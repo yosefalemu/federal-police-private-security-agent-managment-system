@@ -10,6 +10,7 @@ import {
   Avatar,
   styled,
   MenuItem,
+  InputLabel,
 } from "@mui/material";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -25,6 +26,8 @@ const AddUserButton = styled(Button)({
 });
 
 const AddUser = () => {
+  const senderEmail = useSelector((state) => state.user.user.email);
+  const senderEmailPass = useSelector((state) => state.user.user.emailPass);
   const [profilePicture, setProfilePicture] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -34,8 +37,11 @@ const AddUser = () => {
     lastName: "",
     email: "",
     phoneNumber: "",
+    emailPass: "",
     password: "",
     role: "",
+    dateOfBirth: "",
+    nationalId: "",
   });
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -81,6 +87,10 @@ const AddUser = () => {
       toast.error("Please upload all required files");
       return;
     }
+    if (!user.emailPass) {
+      toast.error("Please provide email pass");
+      return;
+    }
 
     const userData = {
       firstName: user.firstName,
@@ -89,8 +99,13 @@ const AddUser = () => {
       email: user.email,
       phoneNumber: user.phoneNumber,
       password: user.password,
+      emailPass: user.emailPass,
       role: user.role,
       profilePicture: profilePicture,
+      nationalId: user.nationalId,
+      dateOfBirth: user.dateOfBirth,
+      senderEmail: senderEmail,
+      senderEmailPass: senderEmailPass,
     };
     console.log(userData);
     setLoading(true);
@@ -109,6 +124,9 @@ const AddUser = () => {
           email: "",
           phoneNumber: "",
           password: "",
+          emailPass: "",
+          nationalId: "",
+          dateOfBirth: "",
         });
         setImage(null);
         setProfilePicture("");
@@ -137,10 +155,9 @@ const AddUser = () => {
             }}
           >
             <Box p={5}>
-              <Typography variant="h5" color={"#112846"} textAlign={"center"}>
+              <Typography variant="h4" color={"#112846"} textAlign={"center"}>
                 Add User
               </Typography>
-
               <Box>
                 <TextField
                   fullWidth
@@ -176,11 +193,42 @@ const AddUser = () => {
                 />
                 <TextField
                   fullWidth
+                  label="Email Pass"
+                  name="emailPass"
+                  value={user.emailPass}
+                  onChange={handleFormChange}
+                  sx={{ backgroundColor: "#F6F5F5", marginTop: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="National Id"
+                  name="nationalId"
+                  value={user.nationalId}
+                  onChange={handleFormChange}
+                  sx={{ backgroundColor: "#F6F5F5", marginTop: 3 }}
+                />
+                <TextField
+                  fullWidth
                   label="Phone Number"
                   name="phoneNumber"
                   value={user.phoneNumber}
                   onChange={handleFormChange}
                   sx={{ backgroundColor: "#F6F5F5", marginTop: 3 }}
+                />
+                <InputLabel htmlFor="dateOfBirth" sx={{ marginTop: 2 }}>
+                  Date Of Birth
+                </InputLabel>
+                <TextField
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  value={user.dateOfBirth}
+                  fullWidth
+                  type="date"
+                  margin="normal"
+                  onChange={handleFormChange}
+                  sx={{
+                    backgroundColor: "#f7f7f7",
+                  }}
                 />
                 <TextField
                   fullWidth
@@ -207,7 +255,6 @@ const AddUser = () => {
                     </MenuItem>
                   ))}
                 </TextField>
-
                 <div
                   style={{
                     padding: "2rem",
@@ -280,7 +327,6 @@ const AddUser = () => {
                     )}
                   </label>
                 </div>
-
                 <AddUserButton
                   type="submit"
                   variant="contained"

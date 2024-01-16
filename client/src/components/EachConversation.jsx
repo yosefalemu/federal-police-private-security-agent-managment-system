@@ -9,9 +9,16 @@ import {
 } from "../redux-toolkit/slices/conversation";
 import { format } from "timeago.js";
 
-const EachConversation = ({ conversation }) => {
-  console.log(conversation);
+const EachConversation = ({
+  conversation,
+  newCreatedMessageId,
+  updatedConversationId,
+}) => {
+  console.log("conversation in each conversation", conversation);
+  console.log("conversation in each conversation", newCreatedMessageId);
+  console.log("conversation in each conversation", updatedConversationId);
   const dispatch = useDispatch();
+  const conversationId = conversation._id;
   const { _id } = useSelector((state) => state.user.user);
   const [senderInfo, setSenderInfo] = useState({});
   const [loading, setLoading] = useState(false);
@@ -19,20 +26,34 @@ const EachConversation = ({ conversation }) => {
   const [numberOfUnviewedMessages, setNumberOfUnviewedMessages] = useState(0);
   const [numberOfMessages, setNumberOfMessages] = useState(0);
   const [messages, setMessages] = useState([]);
+  const [eachMessageId, setEachMessageId] = useState("");
   const senderId = conversation.members?.find((item) => item !== _id);
   console.log(senderId);
 
   useEffect(() => {
     if (senderId) {
       const getSenderInfo = () => {
-        const id = senderId;
         axios
-          .get(`http://localhost:5000/api/v1/users/getsingle/${id}`, {
+          .get(`http://localhost:5000/api/v1/users/getsingle/${senderId}`, {
             withCredentials: true,
           })
           .then((response) => {
             console.log(response);
             setSenderInfo(response.data);
+            if (response.data.role === "agent") {
+              axios
+                .get(
+                  `http://localhost:5000/api/v1/agents/getagentwithemail/${response.data.email}`,
+                  { withCredentials: true }
+                )
+                .then((response) => {
+                  console.log(response);
+                  setSenderInfo(response.data.agent);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -62,7 +83,7 @@ const EachConversation = ({ conversation }) => {
         });
     };
     getUnviewedMessages();
-  }, []);
+  }, [conversationId, eachMessageId, eachMessageId]);
 
   useEffect(() => {
     const getAllMessages = () => {
@@ -80,7 +101,7 @@ const EachConversation = ({ conversation }) => {
         });
     };
     getAllMessages();
-  }, []);
+  }, [newCreatedMessageId, updatedConversationId, conversationId]);
 
   const handleUpdateMessage = (conversation) => {
     console.log("to be updated", conversation);
@@ -101,6 +122,7 @@ const EachConversation = ({ conversation }) => {
               { withCredentials: true }
             )
             .then((response) => {
+              setEachMessageId(response?.data?._id);
               console.log("updated messages", response);
             })
             .catch((error) => {
@@ -181,7 +203,11 @@ const EachConversation = ({ conversation }) => {
           height: "100%",
         }}
       >
-        <Typography variant="body1">{`${senderInfo?.firstName} ${senderInfo?.middleName} ${senderInfo.lastName}`}</Typography>
+        <Typography variant="body1">
+          {senderInfo.role === "admin" || senderInfo.role === "screener"
+            ? `${senderInfo?.firstName} ${senderInfo?.middleName} ${senderInfo.lastName}`
+            : senderInfo.agentName}
+        </Typography>
         <Box
           sx={{
             display: "flex",
@@ -190,10 +216,10 @@ const EachConversation = ({ conversation }) => {
           }}
         >
           <Typography sx={{ fontSize: "14px" }}>
-            {truncateText(lastMessage?.text ? lastMessage?.text : "")}
+            {truncateText(lastMessage?.text ? lastMessage?.text : "Say Hi 🔥")}
           </Typography>
           <Typography variant="body3" sx={{ fontSize: "12px" }}>
-            {`${format(lastMessage?.updatedAt)}`}
+            {lastMessage?.text ? `${format(lastMessage?.createdAt)}` : ""}
           </Typography>
         </Box>
       </Box>

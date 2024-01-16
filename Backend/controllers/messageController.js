@@ -21,11 +21,9 @@ const createMessage = async (req, res) => {
 
 const getMessages = async (req, res) => {
   const id = req.params.conversationId;
-  console.log(id);
   try {
     const messages = await Message.find({ conversationId: id });
     res.status(201).json(messages);
-    console.log(messages);
   } catch (error) {
     res.status(500).json(error);
   }

@@ -397,7 +397,6 @@ export default function Sidebar() {
               </ListItemButton>
             </ListItem>
           )}
-
           {role === "screener" && (
             <ListItem
               disablePadding
@@ -529,6 +528,45 @@ export default function Sidebar() {
           )}
 
           {role === "agent" && (
+            <ListItem
+              disablePadding
+              sx={{
+                display: "block",
+                padding: { md: "0px 5px 0px 0px" },
+                color: "black",
+                background: isActive("chat") ? "lightgray" : "transparent",
+              }}
+              component={Link}
+              to="/chat"
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ChatIcon sx={{ color: "#112846", fontSize: "28px" }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Chat"
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    display: { xs: "none", md: "block" },
+                    color: "#112846",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+          {role === "screener" && (
             <ListItem
               disablePadding
               sx={{

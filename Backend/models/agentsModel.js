@@ -82,6 +82,14 @@ const AgentSchema = new mongoose.Schema(
       ref: "UserSchema",
       required: true,
     },
+    checkedBy: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserSchema",
+    },
+    approvedBy: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserSchema",
+    },
   },
   { timestamps: true }
 );

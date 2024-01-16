@@ -17,11 +17,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import SendIcon from "@mui/icons-material/Send";
 import { useSelector, useDispatch } from "react-redux";
-import AgentListForChat from "../components/AgentListForChat";
+import ChatListForSceAndAdmin from "../components/ChatListForSceAndAdmin";
 import axios from "axios";
 import EachConversation from "../components/EachConversation";
 import Messages from "../components/Messages";
-import AdminListForChat from "../components/AdminListForChat";
+import ChatListForAgents from "../components/ChatListForAgents";
 import { removeCurrentConversation } from "../redux-toolkit/slices/conversation";
 
 const CreateButton = styled(Button)({
@@ -51,12 +51,14 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const { role, _id } = useSelector((state) => state.user.user);
   const { conversationId } = useSelector((state) => state.conversation);
-  const [listModal, setListModal] = useState(false);
+  const [agentListModal, setAgentListModal] = useState(false);
   const [adminListModal, setAdminListModal] = useState(false);
   const [conversationList, setConversationList] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [newCreatedMessageId, setNewCreatedMessageId] = useState("");
+  const [updatedConversationId, setUpdatedConversationId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const scrollRef = useRef();
@@ -80,7 +82,7 @@ const ChatPage = () => {
         });
     };
     getConversationList();
-  }, []);
+  }, [adminListModal, agentListModal, updatedConversationId]);
 
   useEffect(() => {
     if (conversationId) {
@@ -99,7 +101,7 @@ const ChatPage = () => {
       };
       getMessage();
     }
-  }, [conversationId, newMessage]);
+  }, [conversationId, newCreatedMessageId]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,9 +122,26 @@ const ChatPage = () => {
         withCredentials: true,
       })
       .then((response) => {
-        console.log(response.data);
+        console.log("new created message", response.data);
+        setNewCreatedMessageId(response?.data?._id);
         setMessages([...messages, response.data]);
         setNewMessage("");
+        axios
+          .patch(
+            `http://localhost:5000/api/v1/conversation/${conversationId}`,
+            null,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            console.log("updated conversation", response.data);
+            setUpdatedConversationId(response.data._id);
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -136,7 +155,7 @@ const ChatPage = () => {
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
     })
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   console.log("serarch terms", searchTerm);
   console.log(messages);
   return (
@@ -202,11 +221,18 @@ const ChatPage = () => {
                     {role === "admin" ? (
                       <CreateButton
                         variant="outlined"
-                        onClick={() => setListModal(true)}
+                        onClick={() => setAdminListModal(true)}
                       >
                         New
                       </CreateButton>
                     ) : role === "agent" ? (
+                      <CreateButton
+                        variant="outlined"
+                        onClick={() => setAgentListModal(true)}
+                      >
+                        New
+                      </CreateButton>
+                    ) : role === "screener" ? (
                       <CreateButton
                         variant="outlined"
                         onClick={() => setAdminListModal(true)}
@@ -235,7 +261,12 @@ const ChatPage = () => {
                   }}
                 >
                   {sortedConversation?.map((item, index) => (
-                    <EachConversation conversation={item} key={index} />
+                    <EachConversation
+                      conversation={item}
+                      newCreatedMessageId={newCreatedMessageId}
+                      updatedConversationId={updatedConversationId}
+                      key={index}
+                    />
                   ))}
                 </Box>
               </Box>
@@ -308,13 +339,13 @@ const ChatPage = () => {
             </Grid>
           </Grid>
           <ListModalContainer
-            open={listModal}
-            onClose={() => setListModal(false)}
+            open={agentListModal}
+            onClose={() => setAgentListModal(false)}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
             <ListModalWrapper
-              width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
+              width={{ xs: "90%", sm: "70%", md: "50%", lg: "38%" }}
             >
               <Typography
                 variant="h5"
@@ -325,7 +356,7 @@ const ChatPage = () => {
               >
                 Select chat and start conversation
               </Typography>
-              <AgentListForChat setListModal={setListModal} />
+              <ChatListForAgents setListModal={setAgentListModal} />
             </ListModalWrapper>
           </ListModalContainer>
           <ListModalContainer
@@ -335,7 +366,7 @@ const ChatPage = () => {
             aria-describedby="modal-modal-description"
           >
             <ListModalWrapper
-              width={{ xs: "90%", sm: "70%", md: "50%", lg: "30%" }}
+              width={{ xs: "90%", sm: "70%", md: "50%", lg: "38%" }}
             >
               <Typography
                 variant="h5"
@@ -346,7 +377,7 @@ const ChatPage = () => {
               >
                 Select chat and start conversation
               </Typography>
-              <AdminListForChat setAdminListModal={setAdminListModal} />
+              <ChatListForSceAndAdmin setAdminListModal={setAdminListModal} />
             </ListModalWrapper>
           </ListModalContainer>
         </Box>

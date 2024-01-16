@@ -26,6 +26,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import toast from "react-hot-toast";
+import Textarea from "@mui/joy/Textarea";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -38,7 +39,17 @@ const ConfirmModalWrapper = styled(Box)({
   borderRadius: "5px",
   padding: "20px",
 });
-
+const DeclineModalContainer = styled(Modal)({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+const DeclineModalWrapper = styled(Box)({
+  background: "#fff",
+  height: "fit-content",
+  borderRadius: "5px",
+  padding: "20px",
+});
 const ConfirmButton = styled(Button)({
   background: "#112846",
   color: "#fff",
@@ -58,13 +69,19 @@ const CancelButton = styled(Button)({
 
 const AllUsers = () => {
   const dispatch = useDispatch();
-  const { role } = useSelector((state) => state.user.user);
+  const senderEmail = useSelector((state) => state.user.user.email);
+  const emailPass = useSelector((state) => state.user.user.emailPass);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmModal, setConfirmModal] = useState(false);
+  const [declineModal, setDeclineModal] = useState(false);
   const [userId, setUserId] = useState("");
   const [persmission, setPersmission] = useState("");
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [text, setText] = useState("");
 
   const navigate = useNavigate();
 
@@ -83,9 +100,10 @@ const AllUsers = () => {
         });
     };
     getAllEmployeeList();
-  }, []);
+  }, [userId]);
 
   console.log("users", users);
+
   const sortedUsers = [...users]
     .filter((user) =>
       (user?.firstName + user?.middleName + user?.lastName)
@@ -99,7 +117,22 @@ const AllUsers = () => {
   }, []);
 
   const handleUpdateUserPersmission = () => {
-    const dataToBeUpdated = { persmission, email };
+    const dataToBeUpdated = {
+      persmission,
+      email,
+      text,
+      senderEmail,
+      emailPass,
+      firstName,
+      middleName,
+      lastName,
+    };
+    if (persmission === "blocked") {
+      if (!text) {
+        toast.error("please provide reason");
+        return;
+      }
+    }
     axios
       .patch(
         `http://localhost:5000/api/v1/users/updateUserByAdmin/${userId}`,
@@ -109,9 +142,12 @@ const AllUsers = () => {
         }
       )
       .then((response) => {
+        setUserId("");
+        setText("");
         toast.success("User updated successfully");
         setTimeout(() => {
           setConfirmModal(false);
+          setDeclineModal(false);
           navigate("/allusers");
         }, 4000);
 
@@ -186,16 +222,15 @@ const AllUsers = () => {
                 Last Name
               </TableCell>
               <TableCell sx={{ color: "#112846", width: "12%" }}>
-                Email
-              </TableCell>
-              <TableCell sx={{ color: "#112846", width: "12%" }}>
                 Phone Number
               </TableCell>
-              <TableCell sx={{ color: "#112846", width: "3%" }}>Edit</TableCell>
-              <TableCell sx={{ color: "#112846", width: "3%" }}>
-                Permission
+              <TableCell sx={{ color: "#112846", width: "5%" }}>Edit</TableCell>
+              <TableCell
+                sx={{ color: "#112846", width: "15%", textAlign: "center" }}
+              >
+                Edit Permission
               </TableCell>
-              <TableCell sx={{ color: "#112846", width: "3%" }}>
+              <TableCell sx={{ color: "#112846", width: "5%" }}>
                 Details
               </TableCell>
             </TableRow>
@@ -227,17 +262,9 @@ const AllUsers = () => {
                       width: "12%",
                     }}
                   >
-                    {item.email}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      display: { xs: "none", lg: "table-cell" },
-                      width: "12%",
-                    }}
-                  >
                     {item.phoneNumber}
                   </TableCell>
-                  <TableCell sx={{ width: "3%" }}>
+                  <TableCell sx={{ width: "5%" }}>
                     <IconButton
                       sx={{ color: "orange" }}
                       onClick={() => {
@@ -248,34 +275,40 @@ const AllUsers = () => {
                       <EditIcon />
                     </IconButton>
                   </TableCell>
-                  <TableCell sx={{ width: "3%" }}>
+                  <TableCell sx={{ width: "15%", textAlign: "center" }}>
                     {item.persmission === "allowed" ? (
                       <IconButton
-                        sx={{ color: "green" }}
+                        sx={{ color: "orange" }}
                         onClick={() => {
                           setUserId(item?._id);
                           setPersmission("blocked");
                           setEmail(item?.email);
+                          setFirstName(item?.firstName);
+                          setMiddleName(item?.middleName);
+                          setLastName(item?.lastName);
+                          setDeclineModal(true);
+                        }}
+                      >
+                        <DoDisturbIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        sx={{ color: "green" }}
+                        onClick={() => {
+                          setUserId(item?._id);
+                          setPersmission("allowed");
+                          setEmail(item?.email);
+                          setFirstName(item?.firstName);
+                          setMiddleName(item?.middleName);
+                          setLastName(item?.lastName);
                           setConfirmModal(true);
                         }}
                       >
                         <ThumbUpAltIcon />
                       </IconButton>
-                    ) : (
-                      <IconButton
-                        sx={{ color: "orange" }}
-                        onClick={() => {
-                          setUserId(item?._id);
-                          setPersmission("allowed");
-                          setEmail(item?.email);
-                          setConfirmModal(true);
-                        }}
-                      >
-                        <DoDisturbIcon />
-                      </IconButton>
                     )}
                   </TableCell>
-                  <TableCell sx={{ width: "3%" }}>
+                  <TableCell sx={{ width: "5%" }}>
                     <IconButton
                       sx={{ color: "blue" }}
                       onClick={() => {
@@ -329,6 +362,41 @@ const AllUsers = () => {
           </Box>
         </ConfirmModalWrapper>
       </ConfirmModalContainer>
+      <DeclineModalContainer
+        open={declineModal}
+        onClose={() => setDeclineModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <DeclineModalWrapper
+          width={{ xs: "90%", sm: "70%", md: "50%", lg: "55%" }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              gap: "15px",
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant="h5" textAlign={"center"} color={"#112846"}>
+              Decline Reason
+            </Typography>
+            <Textarea
+              minRows={7}
+              sx={{ fontSize: "18px", marginBottom: "20px" }}
+              placeholder="Send to decline reason"
+              onChange={(e) => setText(e.target.value)}
+            />
+
+            <ConfirmButton
+              variant="contained"
+              onClick={handleUpdateUserPersmission}
+            >
+              Confirm
+            </ConfirmButton>
+          </Box>
+        </DeclineModalWrapper>
+      </DeclineModalContainer>
     </Box>
   );
 };

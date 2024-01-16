@@ -24,54 +24,129 @@ import CerteficateGeneratorPage from "./pages/AdminPages/CerteficateGeneratorPag
 import EditEmployeeList from "./pages/Agents/EditEmployeeList.jsx";
 import EditUserPage from "./pages/AdminPages/EditUserPage.jsx";
 import ApplyAssistancePage from "./pages/ApplyAssistancePage.jsx";
+import ReApplyPageAssistance from "./pages/ReApplyPageAssistance.jsx";
+import ReApplyPage from "./pages/ReApplyPage.jsx";
+import ErrorPage from "./pages/ErrorPage.jsx";
+import NotFoundNationalId from "./pages/NotFoundNationalId.jsx";
+import { useSelector } from "react-redux";
 
 function App() {
+  const { user } = useSelector((state) => state?.user);
+  const role = user.role ? user.role : null;
+  console.log(role);
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/screenerrequest" element={<ScreenerRequestPage />} />
-        <Route path="/adminRequest" element={<AdminRequestPage />} />
         <Route path="/apply" element={<ApplyPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/agentslist" element={<AgentsListPage />} />
-        <Route path="/agentemployee/:id" element={<EmployeeDetailPage />} />
-        <Route path="/agentemployee" element={<EmployeePage />} />
-        <Route path="/addemployee" element={<AddEmployeePage />} />
-        <Route path="/createuser" element={<CreateUserPage />} />
-        <Route path="/screenerrequest/agentfile" element={<AgentFliesPage />} />
-        <Route path="/screenerrequest/adminfile" element={<AdminFliePage />} />
-        <Route path="/adminRequest/agentfile" element={<AgentFliesPage />} />
-        <Route path="/adminRequest/adminfile" element={<AdminFliePage />} />
-        <Route path="/agentslist/agentfile" element={<AgentFliesPage />} />
-        <Route path="/agentslist/adminfile" element={<AdminFliePage />} />
-        <Route path="/agentslist/agentdetail" element={<AgentsDetailPage />} />
-        <Route path="/allemployee/:id" element={<EmployeeDetailPage />} />
-        <Route path="/agentslist/:id" element={<AgentEmployeePage />} />
-        <Route
-          path="/agentslist/employee/:id"
-          element={<EmployeeDetailPage />}
-        />
-        <Route path="/allemployee" element={<AllEmployeePage />} />
-        <Route path="/adduser" element={<AddUserPage />} />
-        <Route path="/allusers" element={<AllUsersPage />} />
-        <Route path="/allusers/:id" element={<UserDetailPage />} />
-        <Route
-          path="/screenerrequest/applicationdetail"
-          element={<ApplicationDetail />}
-        />
-        <Route
-          path="/adminRequest/applicationdetail"
-          element={<ApplicationDetail />}
-        />
         <Route path="/chat" element={<ChatPage />} />
-        <Route path="/certeficate" element={<CerteficateGeneratorPage />} />
-        <Route
-          path="/agentemployee/editemployee/:id"
-          element={<EditEmployeeList />}
-        />
-        <Route path="/allusers/editemployee/:id" element={<EditUserPage />} />
         <Route path="/applyassistance" element={<ApplyAssistancePage />} />
+        <Route path="/reapplyassistance" element={<ReApplyPageAssistance />} />
+        <Route path="/reapply/:nationalId" element={<ReApplyPage />} />
+        <Route path="/notfoundbynationalid" element={<NotFoundNationalId />} />
+        {role === "screener" && (
+          <Route path="/screenerrequest" element={<ScreenerRequestPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/adminRequest" element={<AdminRequestPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/agentslist" element={<AgentsListPage />} />
+        )}
+        {(role === "admin" || role === "agent") && (
+          <Route path="/agentemployee/:id" element={<EmployeeDetailPage />} />
+        )}
+        {role === "agent" && (
+          <Route path="/agentemployee" element={<EmployeePage />} />
+        )}
+        {role === "agent" && (
+          <Route path="/addemployee" element={<AddEmployeePage />} />
+        )}
+
+        {role === "admin" && (
+          <Route path="/createuser" element={<CreateUserPage />} />
+        )}
+        {role === "screener" && (
+          <Route
+            path="/screenerrequest/agentfile"
+            element={<AgentFliesPage />}
+          />
+        )}
+        {role === "screener" && (
+          <Route
+            path="/screenerrequest/adminfile"
+            element={<AdminFliePage />}
+          />
+        )}
+
+        {role === "admin" && (
+          <Route path="/adminRequest/agentfile" element={<AgentFliesPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/adminRequest/adminfile" element={<AdminFliePage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/agentslist/agentfile" element={<AgentFliesPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/agentslist/adminfile" element={<AdminFliePage />} />
+        )}
+        {role === "admin" && (
+          <Route
+            path="/agentslist/agentdetail"
+            element={<AgentsDetailPage />}
+          />
+        )}
+        {role === "admin" && (
+          <Route path="/allemployee/:id" element={<EmployeeDetailPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/agentslist/:id" element={<AgentEmployeePage />} />
+        )}
+        {role === "admin" && (
+          <Route
+            path="/agentslist/employee/:id"
+            element={<EmployeeDetailPage />}
+          />
+        )}
+        {role === "admin" && (
+          <Route path="/allemployee" element={<AllEmployeePage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/adduser" element={<AddUserPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/allusers" element={<AllUsersPage />} />
+        )}
+        {role === "admin" && (
+          <Route path="/allusers/:id" element={<UserDetailPage />} />
+        )}
+        {role === "screener" && (
+          <Route
+            path="/screenerrequest/applicationdetail"
+            element={<ApplicationDetail />}
+          />
+        )}
+        {role === "admin" && (
+          <Route
+            path="/adminRequest/applicationdetail"
+            element={<ApplicationDetail />}
+          />
+        )}
+        {role === "admin" && (
+          <Route path="/certeficate" element={<CerteficateGeneratorPage />} />
+        )}
+        {role === "agent" && (
+          <Route
+            path="/agentemployee/editemployee/:id"
+            element={<EditEmployeeList />}
+          />
+        )}
+        {role === "admin" && (
+          <Route path="/allusers/editemployee/:id" element={<EditUserPage />} />
+        )}
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
   );

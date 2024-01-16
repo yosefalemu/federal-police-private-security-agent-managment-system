@@ -1,8 +1,14 @@
+const nodemailer = require("nodemailer");
 
-module.exports = {
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  user: "misgan.moges@aait.edu.et",
-  pass: "misge@32lebawi",
+// Function to configure transporter with dynamic sender email and password
+const emailConfig = (senderEmail, senderPass) => {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: senderEmail,
+      pass: senderPass,
+    },
+  });
 };
+
+module.exports = emailConfig;

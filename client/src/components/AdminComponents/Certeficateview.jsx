@@ -3,6 +3,7 @@ import React from "react";
 import toast from "react-hot-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useNavigate } from "react-router-dom";
 
 const DowloadButton = styled(Button)({
   marginTop: "3px",
@@ -16,8 +17,9 @@ const DowloadButton = styled(Button)({
     background: "#192E77",
   },
 });
-const Certeficateview = ({ certeficate, setCerteficateModal }) => {
-  console.log(certeficate);
+const Certeficateview = ({ certeficateData, setCerteficateModal }) => {
+  console.log("view certeficate", certeficateData);
+  const navigate = useNavigate();
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
   const handleDowloadCeritficate = () => {
@@ -39,10 +41,13 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
         const pdf = new jsPDF("l", "mm", [1000, 670]);
         pdf.addImage(imgData, "PNG", 0, 0, 1000, 667);
         pdf.save(
-          `${certeficate?.agentName.split(" ").join("_")}_certeficate.pdf`
+          `${certeficateData?.agentName
+            .split(" ")
+            .join("_")}_certeficateData.pdf`
         );
         setTimeout(() => {
           setCerteficateModal(false);
+          navigate("/adminRequest");
         }, 4000);
       })
       .catch((error) => {
@@ -112,7 +117,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                 }}
               >
                 <img
-                  src={`${PF}uploads/${certeficate?.profilePicture}`}
+                  src={`${PF}uploads/${certeficateData?.profilePicture}`}
                   alt="test"
                   crossOrigin="anonymous"
                   style={{
@@ -173,7 +178,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   የተቋሙ ስም፡
                 </Typography>
                 <Typography variant="body1">
-                  {certeficate?.agentName}
+                  {certeficateData?.agentName}
                 </Typography>
               </Box>
               <Box
@@ -187,7 +192,9 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
                   አድራሻ፡
                 </Typography>
-                <Typography variant="body1">{certeficate?.address}</Typography>
+                <Typography variant="body1">
+                  {certeficateData?.address}
+                </Typography>
               </Box>
               <Box
                 sx={{
@@ -200,7 +207,9 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
                   ደረጃ፡
                 </Typography>
-                <Typography variant="body1">{certeficate?.level}</Typography>
+                <Typography variant="body1">
+                  {certeficateData?.level}
+                </Typography>
               </Box>
               <Box
                 sx={{
@@ -214,7 +223,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   የተሰጠበት ቀን፡
                 </Typography>
                 <Typography variant="body1">
-                  {certeficate?.dateOfIssuedInEuropeanCalander} ዓ/ም
+                  {certeficateData?.dateOfIssuedInEuropeanCalander} ዓ/ም
                 </Typography>
               </Box>
               <Box
@@ -229,7 +238,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   አገልግሎት የሚያበቃበት ቀን፡
                 </Typography>
                 <Typography variant="body1">
-                  {certeficate?.dateOfIssuedInEuropeanCalander} ዓ/ም
+                  {certeficateData?.dateOfIssuedInEuropeanCalander} ዓ/ም
                 </Typography>
               </Box>
               <Box>
@@ -237,15 +246,41 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   ይህ የምስክር ወረቀት በመመርያ ቁጥር 01/2003 የተሰጠ ነው።
                 </Typography>
               </Box>
-              <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "20px",
+                  height: "fitContent",
+                }}
+              >
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                  የሰጠው ኃላፊ ስም ..............................................
+                  የሰጠው ኃላፊ ስም
+                </Typography>
+                <Typography variant="body1">
+                  {certeficateData?.approverFirstName +
+                    " " +
+                    certeficateData?.approverMiddleName +
+                    " " +
+                    certeficateData.approverLastName}
                 </Typography>
               </Box>
-              <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "20px",
+                }}
+              >
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                  ፊርማ ...........................
+                  ፊርማ
                 </Typography>
+                <Box sx={{ height: "40px" }}>
+                  <img
+                    src={`${certeficateData?.approverSignature}`}
+                    style={{ height: "100%", objectFit: "cover" }}
+                  />
+                </Box>
               </Box>
             </Box>
             <Box sx={{ flex: "1.4" }}>
@@ -270,7 +305,9 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
                   Name of the Agency፡
                 </Typography>
-                <Typography variant="body1">{certeficate.agentName}</Typography>
+                <Typography variant="body1">
+                  {certeficateData.agentName}
+                </Typography>
               </Box>
               <Box
                 sx={{
@@ -283,7 +320,9 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
                   Address:
                 </Typography>
-                <Typography variant="body1">{certeficate.address}</Typography>
+                <Typography variant="body1">
+                  {certeficateData.address}
+                </Typography>
               </Box>
               <Box
                 sx={{
@@ -296,7 +335,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
                   Level:
                 </Typography>
-                <Typography variant="body1">{certeficate.level}</Typography>
+                <Typography variant="body1">{certeficateData.level}</Typography>
               </Box>
               <Box
                 sx={{
@@ -310,7 +349,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   Date of Issued:
                 </Typography>
                 <Typography variant="body1">
-                  {certeficate?.dateOfIssuedInEuropeanCalander}
+                  {certeficateData?.dateOfIssuedInEuropeanCalander}
                 </Typography>
               </Box>
               <Box
@@ -325,7 +364,7 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   Date of Expired:
                 </Typography>
                 <Typography variant="body1">
-                  {certeficate?.dateOfExpiredInEuropeanCalander}
+                  {certeficateData?.dateOfExpiredInEuropeanCalander}
                 </Typography>
               </Box>
               <Box>
@@ -333,15 +372,41 @@ const Certeficateview = ({ certeficate, setCerteficateModal }) => {
                   This Certificate is issued pursuant to directive No 01/2011
                 </Typography>
               </Box>
-              <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "20px",
+                  height: "fitContent",
+                }}
+              >
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                  Approved by ..............................................
+                  Approved by
+                </Typography>
+                <Typography variant="body1">
+                  {certeficateData?.approverFirstName +
+                    " " +
+                    certeficateData?.approverMiddleName +
+                    " " +
+                    certeficateData.approverLastName}
                 </Typography>
               </Box>
-              <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "20px",
+                }}
+              >
                 <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                  Signature ...........................
+                  Signature
                 </Typography>
+                <Box sx={{ height: "40px" }}>
+                  <img
+                    src={`${certeficateData?.approverSignature}`}
+                    style={{ height: "100%", objectFit: "cover" }}
+                  />
+                </Box>
               </Box>
             </Box>
           </Box>

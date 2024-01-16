@@ -15,11 +15,19 @@ const {
 
 router
   .route("/")
-  .get(authenticateUser, authorizePermissions("admin"), getAllAgents);
+  .get(
+    authenticateUser,
+    authorizePermissions("admin", "screener"),
+    getAllAgents
+  );
 
 router
   .route("/getagentwithemail/:email")
-  .get(authenticateUser, authorizePermissions("agent"), getAgentWithEmail);
+  .get(
+    authenticateUser,
+    authorizePermissions("agent", "admin", "screener"),
+    getAgentWithEmail
+  );
 
 router
   .route("/updateAgent/:id")
