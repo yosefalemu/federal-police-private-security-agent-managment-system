@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import SignatureCanvas from "react-signature-canvas";
 import {
   Box,
   Grid,
@@ -29,6 +30,26 @@ const CerteficateModalWrapper = styled(Box)({
   borderRadius: "5px",
 });
 
+const ClearButton = styled(Button)({
+  marginTop: "10px",
+  background: "red",
+  borderRadius: "5px",
+  color: "white",
+  "&:hover": {
+    background: "#FF6868",
+  },
+});
+
+const SaveButton = styled(Button)({
+  marginTop: "10px",
+  background: "#112846",
+  borderRadius: "5px",
+  color: "white",
+  "&:hover": {
+    background: "#192E77",
+  },
+});
+
 const GenerateCeritificateButton = styled(Button)({
   marginTop: "24px",
   background: "#112846",
@@ -42,15 +63,17 @@ const CerteficateComponent = () => {
   const [loading, setLoading] = useState(false);
   const { agentName } = useSelector((state) => state.agent);
   const [certeficateModal, setCerteficateModal] = useState(false);
+  const [approver, setApprover] = useState({});
+  const [certeficateData, setCerteficateData] = useState({});
+  const [sign, setSign] = useState("");
+  const [url, setUrl] = useState("");
 
   const [certeficate, setCerteficate] = useState({
     agentName: "",
     address: "",
     profilePicture: "",
     level: "",
-    dateOfIssuedInEthiopianCalander: "",
     dateOfIssuedInEuropeanCalander: "",
-    dateOfExpiredInEthiopianCalander: "",
     dateOfExpiredInEuropeanCalander: "",
     approvedBy: "",
   });
@@ -71,12 +94,23 @@ const CerteficateComponent = () => {
           address: `${response?.data?.address?.city} yeka ${response?.data?.address?.woreda} ${response.data.address.houseNumber}`,
           profilePicture: response?.data?.profilePicture,
           level: "",
-          dateOfIssuedInEthiopianCalander: "",
           dateOfIssuedInEuropeanCalander: "",
-          dateOfExpiredInEthiopianCalander: "",
           dateOfExpiredInEuropeanCalander: "",
-          approvedBy: "",
         });
+        axios
+          .get(
+            `http://localhost:5000/api/v1/users/getsingle/${response?.data?.approvedBy}`,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            console.log(response);
+            setApprover(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -97,32 +131,47 @@ const CerteficateComponent = () => {
       certeficate.agentName &&
       certeficate.address &&
       certeficate.level &&
-      certeficate.dateOfIssuedInEthiopianCalander &&
       certeficate.dateOfIssuedInEuropeanCalander &&
-      certeficate.dateOfExpiredInEthiopianCalander &&
       certeficate.dateOfExpiredInEuropeanCalander &&
-      certeficate.approvedBy &&
-      certeficate.profilePicture
+      certeficate.profilePicture &&
+      approver.firstName &&
+      approver.middleName &&
+      approver.lastName &&
+      url
     ) {
       console.log("certeficate to be printed", certeficate);
-      setCerteficate({
-        agentName: "",
-        address: "",
-        profilePicture: "",
-        level: "",
-        dateOfIssuedInEthiopianCalander: "",
-        dateOfIssuedInEuropeanCalander: "",
-        dateOfExpiredInEthiopianCalander: "",
-        dateOfExpiredInEuropeanCalander: "",
-        approvedBy: "",
-      });
+      const wholeCerteficateData = {
+        agentName: certeficate.agentName,
+        address: certeficate.address,
+        level: certeficate.level,
+        dateOfIssuedInEuropeanCalander:
+          certeficate.dateOfIssuedInEuropeanCalander,
+        dateOfExpiredInEuropeanCalander:
+          certeficate.dateOfExpiredInEuropeanCalander,
+        profilePicture: certeficate.profilePicture,
+        approverFirstName: approver.firstName,
+        approverMiddleName: approver.middleName,
+        approverLastName: approver.lastName,
+        approverSignature: url,
+      };
+      setCerteficateData(wholeCerteficateData);
       setCerteficateModal(true);
     } else {
       toast.error("Please fill all required fields");
     }
   };
 
-  console.log("certeficate", certeficate);
+  const handleClear = () => {
+    sign.clear();
+  };
+  const handleSave = () => {
+    setUrl(sign.getTrimmedCanvas().toDataURL("image/png"));
+    toast.success("Your signature set successfully");
+  };
+
+  console.log("certeficate", certeficateData);
+  console.log("sign data", sign);
+  console.log("url for image", url);
 
   return (
     <Box
@@ -146,53 +195,40 @@ const CerteficateComponent = () => {
           Generate Certeficate
         </Typography>
         <Box>
-          <InputLabel htmlFor="agentName">Agent Name</InputLabel>
+          <InputLabel htmlFor="agentName" sx={{ marginBottom: 1 }}>
+            Agent Name
+          </InputLabel>
           <TextField
             fullWidth
             name="agentName"
             value={certeficate?.agentName}
             onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
+            sx={{ backgroundColor: "#F6F5F5", marginBottom: 3 }}
           />
-          <InputLabel htmlFor="address">Address</InputLabel>
+          <InputLabel htmlFor="address" sx={{ marginBottom: 1 }}>
+            Address
+          </InputLabel>
           <TextField
             fullWidth
             name="address"
             value={certeficate?.address}
             onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
+            sx={{ backgroundColor: "#F6F5F5", marginBottom: 3 }}
           />
-          <InputLabel htmlFor="level">Level</InputLabel>
+          <InputLabel htmlFor="level" sx={{ marginBottom: 1 }}>
+            Level
+          </InputLabel>
           <TextField
             fullWidth
             name="level"
             value={certeficate?.level}
             onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
+            sx={{ backgroundColor: "#F6F5F5", marginBottom: 3 }}
           />
-          <InputLabel htmlFor="dateOfIssuedInEthiopianCalander">
-            Date Of Issued In Ethiopian Calander
-          </InputLabel>
-          <TextField
-            fullWidth
-            name="dateOfIssuedInEthiopianCalander"
-            type="date"
-            value={certeficate?.dateOfIssuedInEthiopianCalander}
-            onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
-          />
-          <InputLabel htmlFor="dateOfExpiredInEthiopianCalander">
-            Date Of Expired In Ethiopian Calander
-          </InputLabel>
-          <TextField
-            fullWidth
-            name="dateOfExpiredInEthiopianCalander"
-            type="date"
-            value={certeficate?.dateOfExpiredInEthiopianCalander}
-            onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
-          />
-          <InputLabel htmlFor="dateOfIssuedInEuropeanCalander">
+          <InputLabel
+            htmlFor="dateOfIssuedInEuropeanCalander"
+            sx={{ marginBottom: 1 }}
+          >
             Date Of Issued In European Calander
           </InputLabel>
           <TextField
@@ -201,9 +237,12 @@ const CerteficateComponent = () => {
             type="date"
             value={certeficate?.dateOfIssuedInEuropeanCalander}
             onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
+            sx={{ backgroundColor: "#F6F5F5", marginBottom: 3 }}
           />
-          <InputLabel htmlFor="dateOfExpiredInEuropeanCalander">
+          <InputLabel
+            htmlFor="dateOfExpiredInEuropeanCalander"
+            sx={{ marginBottom: 1 }}
+          >
             Date Of Expired In European Calander
           </InputLabel>
           <TextField
@@ -212,17 +251,61 @@ const CerteficateComponent = () => {
             type="date"
             value={certeficate?.dateOfExpiredInEuropeanCalander}
             onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
+            sx={{ backgroundColor: "#F6F5F5", marginBottom: 3 }}
           />
-          <InputLabel htmlFor="approvedBy">Approved By</InputLabel>
+          <InputLabel htmlFor="approvedBy" sx={{ marginBottom: 1 }}>
+            Approved By
+          </InputLabel>
           <TextField
             fullWidth
             name="approvedBy"
-            value={certeficate?.approvedBy}
+            value={
+              approver?.firstName +
+              " " +
+              approver?.middleName +
+              " " +
+              approver?.lastName
+            }
             onChange={handleFormChange}
-            sx={{ backgroundColor: "#F6F5F5", marginBottom: 1 }}
+            sx={{ backgroundColor: "#F6F5F5", marginBottom: 3 }}
           />
-
+          <InputLabel htmlFor="digitalsignature" sx={{ marginBottom: 1 }}>
+            Your signature
+          </InputLabel>
+          <Box>
+            <Box
+              sx={{
+                width: "96%",
+                margin: "auto",
+                height: "200px",
+                border: "3px solid #112846",
+              }}
+            >
+              <SignatureCanvas
+                penColor="#112846"
+                canvasProps={{
+                  height: 200,
+                  className: "sigCanvas",
+                }}
+                ref={(data) => setSign(data)}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+              }}
+            >
+              <ClearButton fullWidth onClick={handleClear}>
+                Clear
+              </ClearButton>
+              <SaveButton fullWidth onClick={handleSave}>
+                Save
+              </SaveButton>
+            </Box>
+          </Box>
+          ,
           <GenerateCeritificateButton
             type="submit"
             variant="contained"
@@ -244,7 +327,7 @@ const CerteficateComponent = () => {
           sx={{ height: "98%" }}
         >
           <Certeficateview
-            certeficate={certeficate}
+            certeficateData={certeficateData}
             setCerteficateModal={setCerteficateModal}
           />
         </CerteficateModalWrapper>

@@ -8,6 +8,7 @@ const {
   createDocument,
   getAllDocuments,
   getSingleDocument,
+  getSingleDocumentByNationalId,
   acceptDocument,
   rejectDocument,
   rejectDocumentByAdmin,
@@ -15,6 +16,7 @@ const {
   checkDocument,
   findUncheckedDocuments,
   findcheckedDocuments,
+  updatedDocumentByNationalId,
 } = require("../controllers/documentController");
 
 router
@@ -44,7 +46,7 @@ router
   .patch(authenticateUser, authorizePermissions("admin"), acceptDocument);
 router
   .route("/rejectDocument/:documentId")
-  .delete(
+  .patch(
     authenticateUser,
     authorizePermissions("admin", "screener"),
     rejectDocument
@@ -57,5 +59,11 @@ router
     rejectDocumentByAdmin
   );
 router.route("/:id").get(authenticateUser, getSingleDocument);
+router
+  .route("/getbynationalId/:nationalId")
+  .get(authenticateUser, getSingleDocumentByNationalId);
+router
+  .route("/updatedDocumentByNationalId/:nationalId")
+  .patch(authenticateUser, updatedDocumentByNationalId);
 
 module.exports = router;

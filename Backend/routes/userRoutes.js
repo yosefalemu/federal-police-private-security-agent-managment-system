@@ -18,7 +18,11 @@ const {
 
 router
   .route("/")
-  .get(authenticateUser, authorizePermissions("admin", "manager"), getAllUsers);
+  .get(
+    authenticateUser,
+    authorizePermissions("admin", "agent", "screener"),
+    getAllUsers
+  );
 
 router.route("/uploadImage").post(uploadImage);
 

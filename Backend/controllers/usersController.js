@@ -11,24 +11,53 @@ const {
 } = require("../utils");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendEmailUserPermissionDeneied = require("../mailServices/sendEmailUserPermissionDeneied");
+const emailConfig = require("../mailServices/emailConfig");
+const sendEmailAddUser = require("../mailServices/sendEmailAddUser");
 
 const createUser = async (req, res) => {
-  const { email } = req.body;
+  const {
+    email,
+    senderEmail,
+    senderEmailPass,
+    role,
+    password,
+    nationalId,
+    firstName,
+    middleName,
+    lastName,
+  } = req.body;
 
   const userExists = await UserSchema.findOne({
-    $or: [{ email }],
+    $or: [{ email }, { nationalId }],
   });
+
   if (userExists) {
     if (userExists.email === email) {
-      throw new BadRequestError("email taken");
+      throw new BadRequestError("Email is already taken");
+    } else if (userExists.nationalId === nationalId) {
+      throw new BadRequestError("National ID is already taken");
     }
   }
+
   const user = await UserSchema.create(req.body);
 
   if (user) {
     await user.save();
     const tokenUser = createTokenUser(user);
     attachCookiesToResponse({ res, user: tokenUser });
+    const senderTransporter = emailConfig(senderEmail, senderEmailPass);
+    sendEmailAddUser({
+      transporter: senderTransporter,
+      email,
+      subject: "Access Permission Granted",
+      password,
+      senderEmail,
+      role,
+      firstName,
+      middleName,
+      lastName,
+    });
     res.status(StatusCodes.CREATED).json({ user });
   } else {
     res.status(400);
@@ -72,7 +101,16 @@ const updateUserByAdmin = async (req, res) => {
   const userId = req.params.userId;
   console.log("req.body", req.body.dataToBeUpdated);
   const { newPasswordToUpdated } = req.body.dataToBeUpdated;
-  const { persmission, email } = req.body.dataToBeUpdated;
+  const {
+    persmission,
+    email,
+    text,
+    senderEmail,
+    emailPass,
+    firstName,
+    middleName,
+    lastName,
+  } = req.body.dataToBeUpdated;
   let hashedPassword = "";
 
   let updateObject = {};
@@ -107,16 +145,27 @@ const updateUserByAdmin = async (req, res) => {
 
   if (persmission) {
     if (persmission === "allowed") {
+      console.log("enable allow ");
+      const senderTransporter = emailConfig(senderEmail, emailPass);
       sendNotificationEmail({
+        transporter: senderTransporter,
         email: email,
         subject: "Access Permission Granted",
-        text: `Congratulations! You have successfully regained access permission. We are delighted to inform you that your access has been reinstated. Your commitment to compliance and security is highly appreciated. Should you have any further questions or concerns, please do not hesitate to reach out. Thank you for your cooperation.`,
+        text: `Congratulations! Dear ${firstName} ${middleName} ${lastName}, You have successfully regained access permission. We are delighted to inform you that your access has been reinstated. Your commitment to compliance and security is highly appreciated. Should you have any further questions or concerns, please do not hesitate to reach out. Thank you for your cooperation.`,
+        senderEmail: senderEmail,
       });
     } else {
-      sendNotificationEmail({
+      console.log("disable permission");
+      const senderTransporter = emailConfig(senderEmail, emailPass);
+      sendEmailUserPermissionDeneied({
+        transporter: senderTransporter,
         email: email,
         subject: "Access Restriction Notification",
-        text: `We regret to inform you that your access permission has been restricted. Please be aware that certain functionalities may no longer be available. If you believe this is an error or have any concerns, kindly contact our support team for assistance. We appreciate your understanding.`,
+        text: text,
+        senderEmail: senderEmail,
+        firstName,
+        middleName,
+        lastName,
       });
     }
   }

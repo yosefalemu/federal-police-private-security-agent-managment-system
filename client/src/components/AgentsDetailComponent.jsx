@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import axios from "axios";
+import EachScreener from "./AdminComponents/EachScreener";
 
 const ListItemForModal = styled(ListItem)({
   display: "flex",
@@ -25,7 +26,7 @@ const AgentsDetailComponent = () => {
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response);
+          console.log("each agents", response.data);
           setAgent(response.data);
         })
         .catch((error) => {
@@ -322,6 +323,64 @@ const AgentsDetailComponent = () => {
                 {agent?.address?.kebele}
               </Typography>
             </ListItemForModal>
+            <ListItemForModal>
+              <Typography
+                variant="h6"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={500}
+              >
+                House Number
+              </Typography>
+              <Typography
+                variant="body1"
+                flex={4}
+                sx={{ color: "#112846" }}
+                fontWeight={400}
+              >
+                {agent?.address?.houseNumber}
+              </Typography>
+            </ListItemForModal>
+            {role === "admin" && (
+              <ListItemForModal>
+                <Typography
+                  variant="h6"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={500}
+                >
+                  Screened By
+                </Typography>
+                <Typography
+                  variant="body1"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={400}
+                >
+                  <EachScreener screenerId={agent?.checkedBy} />
+                </Typography>
+              </ListItemForModal>
+            )}
+            {role === "admin" && (
+              <ListItemForModal>
+                <Typography
+                  variant="h6"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={500}
+                >
+                  Approved By
+                </Typography>
+                <Typography
+                  variant="body1"
+                  flex={4}
+                  sx={{ color: "#112846" }}
+                  fontWeight={400}
+                >
+                  <EachScreener screenerId={agent?.approvedBy} />
+                </Typography>
+              </ListItemForModal>
+            )}
           </List>
         </Box>
       </Box>

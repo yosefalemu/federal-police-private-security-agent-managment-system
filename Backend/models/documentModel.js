@@ -94,6 +94,19 @@ const DocumentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    checkedBy: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserSchema",
+    },
+    approvedBy: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserSchema",
+    },
+    newUpdate: {
+      type: String,
+      enum: [true, false],
+      default: false,
+    },
   },
   { timestamps: true }
 );

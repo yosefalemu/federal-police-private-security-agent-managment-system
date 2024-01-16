@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Container,
@@ -18,9 +18,10 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
 import ApplyHeader from "../components/ApplyHeader";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import { useNavigate } from "react-router-dom";
 
 const FileContainer = styled(Box)({
   display: "flex",
@@ -72,7 +73,9 @@ const ApplyButton = styled(Button)({
   },
 });
 
-const ApplyPage = () => {
+const ReApplyPage = () => {
+  const navigate = useNavigate();
+  const { nationalId } = useParams();
   const [profilePicture, setProfilePicture] = useState("");
   const [agentProfilePictureImage, setAgentProfilePictureImage] = useState("");
   const [agentLogo, setAgentLogo] = useState("");
@@ -97,6 +100,38 @@ const ApplyPage = () => {
     kebele: "",
     houseNumber: "",
   });
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://localhost:5000/api/v1/documents/getbynationalId/${nationalId}`,
+        { withCredentials: true }
+      )
+      .then((response) => {
+        console.log("fetched document", response.data);
+        setApply({
+          agentName: response.data.agentName,
+          firstName: response.data.firstName,
+          middleName: response.data.middleName,
+          lastName: response.data.lastName,
+          dateOfBirth: response.data.dateOfBirth,
+          email: response.data.email,
+          nationalId: response.data.nationalId,
+          phoneNumber: response.data.phoneNumber,
+          city: response.data.address.city,
+          woreda: response.data.address.woreda,
+          kebele: response.data.address.kebele,
+          houseNumber: response.data.address.houseNumber,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(
+          `There is no registered document with NationalId ${nationalId}`
+        );
+        navigate("/notfoundbynationalid");
+      });
+  }, [nationalId]);
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
@@ -228,7 +263,7 @@ const ApplyPage = () => {
       });
   };
 
-  const createDocument = () => {
+  const updateDocument = () => {
     const address = {
       city: apply.city,
       kebele: apply.kebele,
@@ -266,12 +301,18 @@ const ApplyPage = () => {
       ownerFile: ownerFile,
       agentUniform: agentUniform,
       profilePicture: profilePicture,
+      newUpdate: true,
+      status: "pending",
     };
-    console.log(documentData);
+    console.log("data to be updated", documentData);
 
     setLoading(true);
     axios
-      .post("http://localhost:5000/api/v1/documents/apply", documentData)
+      .patch(
+        `http://localhost:5000/api/v1/documents/updatedDocumentByNationalId/${apply?.nationalId}`,
+        documentData,
+        { withCredentials: true }
+      )
       .then((response) => {
         console.log(response);
         toast.success("Document send wait response on your email");
@@ -292,8 +333,8 @@ const ApplyPage = () => {
         setAgentLogoImage(null);
         setAgentProfilePictureImage(null);
         setAgentUniformImage(null);
-        setAgentFile("");
-        setOwnerFile("");
+        setAgentFile(null);
+        setOwnerFile(null);
         setLoading(false);
       })
       .catch((error) => {
@@ -797,11 +838,11 @@ const ApplyPage = () => {
               </InputContainerUploadFile>
             </FileContainer>
           </WholeInputContainer>
-          <ApplyButton onClick={createDocument}>Submit Application</ApplyButton>
+          <ApplyButton onClick={updateDocument}>Submit Application</ApplyButton>
         </Paper>
       </Box>
     </Container>
   );
 };
 
-export default ApplyPage;
+export default ReApplyPage;

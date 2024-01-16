@@ -28,13 +28,17 @@ import {
   setConfirmId,
 } from "../../redux-toolkit/slices/fileSilce";
 import toast from "react-hot-toast";
-import { setCurrentDocument } from "../../redux-toolkit/slices/document";
+import {
+  setAllRequestDocument,
+  setCurrentDocument,
+} from "../../redux-toolkit/slices/document";
 import { useNavigate } from "react-router-dom";
 import {
   removeFrom,
   setAgentName,
   setFrom,
 } from "../../redux-toolkit/slices/agents";
+import EachScreener from "./EachScreener";
 
 const ConfirmModalContainer = styled(Modal)({
   display: "flex",
@@ -80,16 +84,19 @@ const CancelButton = styled(Button)({
 const AdminRequest = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { _id, emailPass, email } = useSelector((state) => state.user.user);
   const { confirmId } = useSelector((state) => state.file);
+  const { requestDocuments } = useSelector((state) => state.document);
   const [allRequests, setAllRequests] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
   const [declineModal, setDeclineModal] = useState(false);
+  const [confirmRequestId, setConfirmRequestId] = useState("");
 
   useEffect(() => {
     dispatch(removeFrom());
   }, []);
   useEffect(() => {
-    const getAllRequestScreenerRequestList = () => {
+    const getAllAdminRequestList = () => {
       axios
         .get("http://localhost:5000/api/v1/documents/getchecked", {
           withCredentials: true,
@@ -97,19 +104,20 @@ const AdminRequest = () => {
         .then((response) => {
           console.log(response);
           setAllRequests(response.data.documents);
+          dispatch(setAllRequestDocument(response.data.documents));
         })
         .catch((error) => {
           console.log(error);
         });
     };
-    getAllRequestScreenerRequestList();
+    getAllAdminRequestList();
   }, []);
 
   const handleConfirmRequest = () => {
     axios
       .patch(
         `http://localhost:5000/api/v1/documents/acceptDocument/${confirmId}`,
-        null,
+        { approvedBy: _id, emailPass: emailPass, senderEmail: email },
         { withCredentials: true }
       )
       .then((response) => {
@@ -138,6 +146,7 @@ const AdminRequest = () => {
       .then((response) => {
         console.log(response);
         toast.success("Document reject successefully");
+        navigate("/chat");
         setDeclineModal(false);
       })
       .catch((error) => {
@@ -147,6 +156,11 @@ const AdminRequest = () => {
       });
   };
   console.log("allRequests", allRequests);
+
+  const AllAdminRequestListToDisplay = requestDocuments
+    .filter((item) => item?._id !== confirmRequestId)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
   return (
     <Box>
       <TableContainer component={Paper} sx={{ bgcolor: "#f7f7f7" }}>
@@ -180,11 +194,11 @@ const AdminRequest = () => {
               <TableCell
                 sx={{
                   color: "#112846",
-                  width: "10%",
-                  textAlign: "center",
+                  width: "15%",
+                  textAlign: "left",
                 }}
               >
-                Phone
+                Checked By
               </TableCell>
               <TableCell
                 sx={{
@@ -215,7 +229,7 @@ const AdminRequest = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {allRequests?.map((item, index) => (
+            {AllAdminRequestListToDisplay?.map((item, index) => (
               <TableRow key={index}>
                 <TableCell
                   sx={{
@@ -247,10 +261,10 @@ const AdminRequest = () => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    width: "10%",
+                    width: "15%",
                   }}
                 >
-                  {item.phoneNumber}
+                  <EachScreener screenerId={item.checkedBy} />
                 </TableCell>
                 <TableCell sx={{ width: "5%", textAlign: "center" }}>
                   <IconButton
@@ -314,79 +328,90 @@ const AdminRequest = () => {
                     <DeleteForeverIcon />
                   </IconButton>
                 </TableCell>
+                <ConfirmModalContainer
+                  open={confirmModal}
+                  onClose={() => setConfirmModal(false)}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <ConfirmModalWrapper
+                    width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
+                  >
+                    <Box>
+                      <Typography textAlign={"center"} fontSize={24}>
+                        Are you sure?
+                      </Typography>
+                      <Box
+                        sx={{
+                          marginTop: "20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <CancelButton
+                          variant="contained"
+                          onClick={() => setConfirmModal(false)}
+                        >
+                          Cancel
+                        </CancelButton>
+                        <ConfirmButton
+                          variant="contained"
+                          onClick={handleConfirmRequest}
+                        >
+                          Confirm
+                        </ConfirmButton>
+                      </Box>
+                    </Box>
+                  </ConfirmModalWrapper>
+                </ConfirmModalContainer>
+                <DeclineModalContainer
+                  open={declineModal}
+                  onClose={() => setDeclineModal(false)}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <DeclineModalWrapper
+                    width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
+                  >
+                    <Box>
+                      <Typography textAlign={"center"} fontSize={24}>
+                        Are you sure?
+                      </Typography>
+                      <Box
+                        sx={{
+                          marginTop: "20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <CancelButton
+                          variant="contained"
+                          onClick={() => setDeclineModal(false)}
+                        >
+                          Cancel
+                        </CancelButton>
+                        <ConfirmButton
+                          variant="contained"
+                          onClick={() => {
+                            handledRejectRequest();
+                            setTimeout(() => {
+                              setConfirmRequestId(item?._id);
+                            }, 4000);
+                          }}
+                        >
+                          Confirm
+                        </ConfirmButton>
+                      </Box>
+                    </Box>
+                  </DeclineModalWrapper>
+                </DeclineModalContainer>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <ConfirmModalContainer
-        open={confirmModal}
-        onClose={() => setConfirmModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <ConfirmModalWrapper
-          width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
-        >
-          <Box>
-            <Typography textAlign={"center"} fontSize={24}>
-              Are you sure?
-            </Typography>
-            <Box
-              sx={{
-                marginTop: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <CancelButton
-                variant="contained"
-                onClick={() => setConfirmModal(false)}
-              >
-                Cancel
-              </CancelButton>
-              <ConfirmButton variant="contained" onClick={handleConfirmRequest}>
-                Confirm
-              </ConfirmButton>
-            </Box>
-          </Box>
-        </ConfirmModalWrapper>
-      </ConfirmModalContainer>
-      <DeclineModalContainer
-        open={declineModal}
-        onClose={() => setDeclineModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <DeclineModalWrapper
-          width={{ xs: "90%", sm: "70%", md: "50%", lg: "25%" }}
-        >
-          <Box>
-            <Typography textAlign={"center"} fontSize={24}>
-              Are you sure?
-            </Typography>
-            <Box
-              sx={{
-                marginTop: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <CancelButton
-                variant="contained"
-                onClick={() => setDeclineModal(false)}
-              >
-                Cancel
-              </CancelButton>
-              <ConfirmButton variant="contained" onClick={handledRejectRequest}>
-                Confirm
-              </ConfirmButton>
-            </Box>
-          </Box>
-        </DeclineModalWrapper>
-      </DeclineModalContainer>
     </Box>
   );
 };
