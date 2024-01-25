@@ -322,9 +322,9 @@ const ChatPage = () => {
                             <IconButton onClick={handleMessageSubmit}>
                               <SendIcon />
                             </IconButton>
-                            <IconButton>
+                            {/* <IconButton>
                               <UploadFileIcon />
-                            </IconButton>
+                            </IconButton> */}
                           </InputAdornment>
                         ),
                       }}
