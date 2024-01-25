@@ -172,7 +172,7 @@ const EditUser = () => {
           onChange={(e) => setNewPassword(e.target.value)}
           sx={{ backgroundColor: "#f7f7f7", marginTop: 0, marginBottom: 2 }}
         />
-        {users.agent === "agent" && (
+        {(users.role === "admin" || users.role === "screener") && (
           <>
             <InputLabel htmlFor="role">Role</InputLabel>
             <TextField
